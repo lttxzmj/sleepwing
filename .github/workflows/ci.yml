@@ -7,8 +7,16 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    runs-on: macos-15
+    # The speech pipeline uses the modern SpeechAnalyzer API, so the
+    # build needs the newest macOS SDK the fleet offers.
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      - name: Select the newest Xcode on the image
+        run: |
+          latest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          echo "using $latest"
+          sudo xcode-select -s "$latest"
+          swift --version
       - name: Run deterministic test suite
         run: swift test
