@@ -9,6 +9,14 @@ Sleepwing 是一款隐私优先的 macOS 桌面陪伴应用，在本地 AI 编�
 > AI 干活，你歇会儿——需要你的时候，它会把你叫回来。
 
 <p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/actions/workflows/ci.yml"><img src="https://github.com/lttxzmj/sleepwing/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/github/v/release/lttxzmj/sleepwing?label=beta" alt="Release">
+  <img src="https://img.shields.io/badge/macOS-14%2B%20Apple%20Silicon-blue" alt="macOS 14+">
+  <img src="https://img.shields.io/badge/network%20calls-zero-brightgreen" alt="Zero network">
+  <img src="https://img.shields.io/badge/license-FSL--1.1--MIT-lightgrey" alt="FSL-1.1-MIT">
+</p>
+
+<p align="center">
   <img src="Site/assets/sleepwing-idle.gif" width="144" alt="睡眠中的眠翼鸟">
   <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="探头叫你回来的眠翼鸟">
   <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="庆祝任务完成的眠翼鸟">

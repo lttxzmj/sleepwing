@@ -124,6 +124,14 @@ private struct PerchMenuView: View {
                     model.companionVisible.toggle()
                 }
                 Spacer()
+                // Explicit click opens the browser; the app itself still
+                // makes no outbound requests. Zero telemetry means this
+                // link is the only road user feedback can travel.
+                Button("ui.feedback") {
+                    NSWorkspace.shared.open(
+                        URL(string: "https://github.com/lttxzmj/sleepwing/discussions")!
+                    )
+                }
                 Button("ui.quit") { NSApplication.shared.terminate(nil) }
             }
         }

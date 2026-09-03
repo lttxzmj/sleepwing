@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get notified when Cursor's agent finishes or needs input (macOS) — hooks, options, and a desktop pet</title>
+<meta name="description" content="Stop tab-checking Cursor: how to get a macOS notification when Cursor's agent finishes, fails, or waits for you — including Cursor's hooks.json, and a free desktop pet that watches Cursor IDE and CLI together.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/cursor.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Get notified when Cursor's agent finishes or needs you (macOS)">
+<meta property="og:description" content="Cursor hooks, honest options, and a free pet that watches Cursor IDE and CLI together.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.55em;line-height:1.35}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Get notified when Cursor's agent finishes or needs input (macOS)</h1>
+<p class="lead">Cursor's agent can run for minutes at a time — and it stops silently when it needs a permission or finishes. Here are your options, from built-in to a full watcher, honestly compared.</p>
+
+<h2>Option 1 — Cursor's own signals</h2>
+<p>Cursor plays a completion sound (check <code>Settings → General</code>) and shows in-window state. That works while Cursor is frontmost — which is exactly the situation you're trying to escape.</p>
+
+<h2>Option 2 — Cursor hooks (DIY, free)</h2>
+<p>Cursor supports a global <code>~/.cursor/hooks.json</code> with lifecycle events. A minimal example that plays a sound when the agent stops:</p>
+<pre><code>{
+  "version": 1,
+  "hooks": {
+    "stop": [
+      { "command": "afplay /System/Library/Sounds/Glass.aiff" }
+    ]
+  }
+}</code></pre>
+<p>Honest limits: one sound for every outcome — no distinction between finished, failed, and waiting-for-permission; nothing tells you <em>which</em> project; and note that <b>Cursor IDE and Cursor CLI share this same file</b>, so test both if you use both.</p>
+
+<h2>Option 3 — a watcher that covers Cursor IDE and CLI together</h2>
+<p><a href="index.html">Sleepwing</a> (free beta) installs Cursor's official hooks for <code>beforeSubmitPrompt</code>, <code>preToolUse</code>, <code>postToolUse</code>, <code>afterAgentResponse</code>, <code>stop</code> and <code>sessionEnd</code> — reversibly, without touching your existing entries — and puts one pet on your desktop that:</p>
+<ul>
+<li>distinguishes <b>working / waiting-for-you / finished / failed</b>, per session;</li>
+<li>brings you back to Cursor with one click, and covers your other agents too (Claude Code, Codex, OpenCode, Gemini CLI, TRAE, pi) with the same pet;</li>
+<li>turns agent work time into small real breaks — paused the moment Cursor waits on you;</li>
+<li>makes <b>zero</b> outbound network requests — no account, no telemetry; hooks sanitize locally so prompts, code, and paths never leave. <a href="https://github.com/lttxzmj/sleepwing">Grep the source.</a></li>
+</ul>
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the notarized beta (macOS 14+, Apple Silicon)</a></p>
+
+<div class="note"><b>Pick by situation:</b> one Cursor window and you stay at your desk → the built-in sound is enough. Comfortable with JSON and only Cursor → the DIY hook. Multiple agents a day, or you actually want to step away → that's what Sleepwing is for.</div>
+
+<h2>中文速览</h2>
+<p>Cursor 的 Agent 跑长任务时静默结束，容易一直切屏查看。方案：内置提示音（仅前台有效）；自己写 <code>~/.cursor/hooks.json</code> 放音效（上面有例子，注意 IDE 和 CLI 共用此文件）；或用 <a href="index.html">Sleepwing</a> 桌宠——可逆安装官方 hooks，区分「工作中/等你/完成/失败」，一键跳回，还同时看管 Claude Code、Codex、TRAE 等其他 Agent。零外联，免费 Beta。</p>
+
+<footer>
+Facts checked 2026-09; corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+See also: <a href="guide-agent-notifications.html">the Claude Code / Codex guide</a> · <a href="compare.html">Sleepwing vs the alternatives</a>.
+</footer>
+</main>
+</body>
+</html>

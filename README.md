@@ -5,6 +5,14 @@
 [中文](README.zh-Hans.md) | English
 
 <p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/actions/workflows/ci.yml"><img src="https://github.com/lttxzmj/sleepwing/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/github/v/release/lttxzmj/sleepwing?label=beta" alt="Release">
+  <img src="https://img.shields.io/badge/macOS-14%2B%20Apple%20Silicon-blue" alt="macOS 14+">
+  <img src="https://img.shields.io/badge/network%20calls-zero-brightgreen" alt="Zero network">
+  <img src="https://img.shields.io/badge/license-FSL--1.1--MIT-lightgrey" alt="FSL-1.1-MIT">
+</p>
+
+<p align="center">
   <img src="Site/assets/sleepwing-idle.gif" width="96" alt="Sleepwing keeping watch while agents work">
   <img src="Site/assets/sleepwing-waiting.gif" width="96" alt="Sleepwing calling you back">
   <img src="Site/assets/sleepwing-celebrate.gif" width="96" alt="Sleepwing celebrating a completed task">
@@ -70,6 +78,10 @@ The repository contains the v0.6.0 Beta RC development build:
 - display-aware companion recovery across screen changes, Space changes, unlock, and wake
 - bounded, revision-aware sprite-atlas caching with state prewarming and frame-boundary scheduling matched to each animation's declared timing
 - 114 deterministic tests, an ad-hoc signed development `.app`, and a fail-closed Developer ID/notarization release script
+
+## Claude Code integration, in depth
+
+Sleepwing installs hooks for eight Claude Code events (`UserPromptSubmit`, `PreToolUse`, `PermissionRequest`, `PostToolUse`, `Notification`, `Stop`, `StopFailure`, `SessionEnd`), filters `Notification` to the four attention-bearing types, treats `StopFailure` as a content-free failure that a racing `SessionEnd` cannot erase, and never touches hooks it does not own. Details: [docs/HOOK_SETUP.md](docs/HOOK_SETUP.md).
 
 ## Run locally
 

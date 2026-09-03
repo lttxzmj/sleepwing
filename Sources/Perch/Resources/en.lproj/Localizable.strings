@@ -521,3 +521,4 @@
 "voice.agent.waiting" = "{provider} has paused and is waiting for your input.";
 "voice.agent.failed" = "{provider} hit a problem and needs you to take a look.";
 "voice.agent.task" = "The task is: {task}.";
+"ui.feedback" = "Feedback";

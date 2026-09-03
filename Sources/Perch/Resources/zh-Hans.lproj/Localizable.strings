@@ -521,3 +521,4 @@
 "voice.agent.waiting" = "{provider} 停下来了，正在等你的输入。";
 "voice.agent.failed" = "{provider} 遇到了问题，需要你回来看看。";
 "voice.agent.task" = "任务是：{task}。";
+"ui.feedback" = "反馈";
