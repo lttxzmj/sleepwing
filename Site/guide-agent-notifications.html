@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get notified when Claude Code or Codex finishes (macOS) — every option, honestly compared</title>
+<meta name="description" content="All the ways to get a macOS notification when Claude Code, Codex, or Cursor finishes or needs input: built-in hooks, a copy-paste DIY setup, official push, and multi-agent watchers.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/guide-agent-notifications.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Get notified when your coding agent finishes or needs you (macOS)">
+<meta property="og:description" content="Built-in hooks, DIY sounds, official push, and multi-agent watchers — every option honestly compared.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.6em;line-height:1.3}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Get notified when Claude Code or Codex finishes (macOS): every option, honestly compared</h1>
+<p class="lead">You started a long agent run, switched away, and now you're tab-checking every ninety seconds. Here is every way to stop doing that — from free built-ins to a full multi-agent watcher. Use the simplest one that fits.</p>
+
+<h2>Option 1 — the terminal bell (free, 30 seconds)</h2>
+<p>In Claude Code, run <code>/config</code> and enable the notification/bell preference; iTerm2 and Terminal.app can both post a system notification on a bell. Works for one session in one terminal. Falls apart the moment you run two agents.</p>
+
+<h2>Option 2 — a DIY Claude Code hook (free, 5 minutes)</h2>
+<p>Claude Code's official <a href="https://code.claude.com/docs/en/hooks" rel="nofollow">hooks</a> can run any command when the agent needs input or stops. A minimal <code>~/.claude/settings.json</code> that plays a sound:</p>
+<pre><code>{
+  "hooks": {
+    "Notification": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Glass.aiff" }] }],
+    "Stop": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Funk.aiff" }] }]
+  }
+}</code></pre>
+<p>Honest limits: it can't tell a permission ask from a question, says nothing about <em>which</em> project finished, and you'll re-build it per agent (Codex, Cursor and Gemini each have different hook formats).</p>
+
+<h2>Option 3 — official pushes</h2>
+<p>Claude Code can send a <a href="https://code.claude.com/docs/en/whats-new/2026-w16" rel="nofollow">mobile push</a> when a long task finishes or needs a decision. The ChatGPT desktop app ships <a href="https://developers.openai.com/codex/pets" rel="nofollow">Codex Pets</a> — an on-screen pet with Running / Needs-input states for Codex sessions. Both are good; both only cover their own agent.</p>
+
+<h2>Option 4 — one watcher for every agent</h2>
+<p><a href="index.html">Sleepwing</a> (free beta, this site) installs the official hook or plugin for <b>seven surfaces</b> — Claude Code, Cursor IDE/CLI, Codex/ChatGPT, OpenCode, Gemini CLI, TRAE, pi — and puts one pet on your desktop that:</p>
+<ul>
+<li>tells you <b>which</b> agent needs you and drops you back into the <b>exact session</b> on click;</li>
+<li>turns verified agent work time into small real breaks (water, stretch) — paused whenever an agent is waiting on you;</li>
+<li>optionally <b>speaks</b> the ask out loud, and lets you dispatch new work by holding the pet and talking;</li>
+<li>sends <b>zero</b> outbound network traffic — no account, no telemetry; the hooks strip prompts, code and paths locally before anything reaches the app. <a href="https://github.com/lttxzmj/sleepwing">Grep the source.</a></li>
+</ul>
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the notarized beta (macOS 14+, Apple Silicon)</a></p>
+
+<div class="note"><b>Which should you pick?</b> One agent, one terminal → the bell. Comfortable editing JSON and only use Claude Code → the DIY hook. On your phone a lot → official push. Two or more agents a day → that's exactly what Sleepwing exists for.</div>
+
+<h2>中文速览</h2>
+<p>想在 Claude Code / Codex 跑完或需要你时收到通知？最简单是终端铃声；进阶是自己写 hooks 放个音效（上面有可复制的配置）；官方也有手机推送和 Codex 桌宠。但如果你每天并行两个以上 Agent，<a href="index.html">Sleepwing</a> 用一只桌宠统一看管七个平台（含 TRAE 国内版）：说清是谁在等你、一键跳回原会话、把等待时间换成喝水拉伸的小休息，还能按住桌宠说话直接派活。零外联、免费 Beta。</p>
+
+<footer>
+Facts checked 2026-09 against official docs; corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>. See also: <a href="compare.html">Sleepwing vs the alternatives</a>.
+</footer>
+</main>
+</body>
+</html>
