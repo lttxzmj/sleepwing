@@ -1,0 +1,15 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Perch app icon</title>
+  <desc>The calm mascot bird — standing level with eyes closed — optically centered on a soft mint rounded-square background.</desc>
+  <rect x="0" y="0" width="200" height="200" rx="44" fill="#DDEDE6"/>
+  <path d="M62 68 Q38 88 52 128" stroke="#2E8577" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <path d="M138 68 Q162 88 148 128" stroke="#2E8577" stroke-width="20" fill="none" stroke-linecap="round"/>
+  <path d="M88 132 Q86 140 84 146" stroke="#2E8577" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <path d="M112 132 Q114 140 116 146" stroke="#2E8577" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <ellipse cx="84" cy="148" rx="13" ry="7" fill="#F0A23A"/>
+  <ellipse cx="116" cy="148" rx="14" ry="7" fill="#F0A23A"/>
+  <ellipse cx="100" cy="92" rx="50" ry="48" fill="#2E8577"/>
+  <ellipse cx="100" cy="105" rx="30" ry="32" fill="#ffffff"/>
+  <ellipse cx="145" cy="82" rx="17" ry="11" fill="#F0A23A"/>
+  <path d="M122 68 Q128 73 134 68" stroke="#1C3D36" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+</svg>

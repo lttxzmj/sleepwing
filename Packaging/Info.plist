@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>Sleepwing</string>
+	<key>CFBundleExecutable</key>
+	<string>Perch</string>
+	<key>CFBundleIconFile</key>
+	<string>Perch.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>app.sleepwing.Sleepwing</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Sleepwing</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.6.0</string>
+	<key>CFBundleVersion</key>
+	<string>17</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2026 Perch contributors</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Perch listens only while you ask it to — holding the companion, or tapping the microphone. Speech is recognized on this Mac and never leaves it.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>What you say is turned into text entirely on this Mac. Nothing is sent to a server.</string>
+	<key>PerchShowSettingsOnLaunch</key>
+	<false/>
+</dict>
+</plist>

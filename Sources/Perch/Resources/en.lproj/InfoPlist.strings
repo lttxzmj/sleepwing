@@ -1,0 +1,5 @@
+/* System permission prompts. The prompt itself is drawn by macOS in the
+   system language, so these must each stay in one language: a bilingual
+   string shows both at once inside a single dialog. */
+"NSMicrophoneUsageDescription" = "Perch listens only while you ask it to — holding the companion, or tapping the microphone. Speech is recognized on this Mac and never leaves it.";
+"NSSpeechRecognitionUsageDescription" = "What you say is turned into text entirely on this Mac. Nothing is sent to a server.";

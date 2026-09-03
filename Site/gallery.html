@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleepwing 宠物画廊 — 制作并分享你的桌面伙伴</title>
+<meta name="description" content="为 Sleepwing 制作你自己的动画桌宠：用 perch-pet Agent 技能把角色创意或参考图变成可导入的 .perchpet 素材包，并向社区画廊投稿分享。">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/gallery.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:url" content="https://lttxzmj.github.io/sleepwing/gallery.html">
+<meta property="og:title" content="Sleepwing 宠物画廊 — Pet Gallery">
+<meta property="og:description" content="Make your own animated Sleepwing companion with the perch-pet agent skill, and share it with the community gallery.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{
+  --teal:#2F8879; --ink:#173F38; --amber:#F3A33A; --mint:#D8EBE3;
+  --wait:#D16E1F; --red:#B8312E;
+  --bg:#FBFCFB; --surface:#FFFFFF; --surface-2:#F2F6F4; --border:#E2E9E6;
+  --text:#1C2422; --text-2:#575F6B; --link:#2F8879;
+  --radius:12px; --radius-lg:20px;
+  --shadow:0 1px 2px rgba(23,63,56,.06),0 4px 16px rgba(23,63,56,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121716; --surface:#1A211F; --surface-2:#202826; --border:#2C3634;
+    --text:#E8EEEC; --text-2:#9AA6A2; --link:#5FB7A6; --mint:#1F3730;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue","Segoe UI",Roboto,"Noto Sans SC",sans-serif;
+  font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+[data-lang="zh"] [data-l="en"]{display:none!important}
+[data-lang="en"] [data-l="zh"]{display:none!important}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:4px}
+code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.875em;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:.1em .4em}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+section{padding:56px 0}
+h1,h2,h3{line-height:1.25;margin:0 0 .5em}
+h1{font-size:clamp(1.8rem,4.5vw,2.6rem);letter-spacing:-.02em}
+h2{font-size:1.5rem;letter-spacing:-.01em}
+.kicker{display:block;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.sub{color:var(--text-2);max-width:660px;margin:0 0 8px}
+header.site{
+  position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;color:var(--text)}
+.brand img{width:30px;height:30px;border-radius:7px}
+.nav-links{display:flex;gap:18px;margin-left:auto;font-size:.9rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.lang-btn{
+  border:1px solid var(--border);background:var(--surface);color:var(--text);
+  border-radius:999px;padding:5px 14px;font-size:.85rem;cursor:pointer;
+}
+.lang-btn:hover{border-color:var(--teal);color:var(--teal)}
+.steps{counter-reset:step;display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
+.step .n{
+  counter-increment:step;display:inline-flex;width:30px;height:30px;border-radius:999px;
+  background:var(--mint);color:var(--ink);font-weight:700;align-items:center;justify-content:center;margin-bottom:12px;
+}
+@media (prefers-color-scheme: dark){.step .n{color:#8FD4C5}}
+.step .n::before{content:counter(step)}
+.step h3{font-size:1rem}
+.step p{color:var(--text-2);font-size:.925rem;margin:0}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:28px;
+}
+.card ul{margin:10px 0 0;padding-left:20px;color:var(--text-2);font-size:.925rem}
+.card li{margin-bottom:6px}
+.empty{
+  text-align:center;padding:48px 28px;border-style:dashed;color:var(--text-2);
+  background:var(--surface-2);
+}
+.empty h3{color:var(--text)}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;border-radius:10px;
+  padding:10px 22px;font-size:.95rem;font-weight:600;border:1px solid transparent;cursor:pointer;
+}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--ink);text-decoration:none}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal);text-decoration:none}
+.note{font-size:.875rem;color:var(--text-2)}
+.alt-bg{background:var(--surface-2)}
+footer{border-top:1px solid var(--border);padding:32px 0 48px;color:var(--text-2);font-size:.875rem}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="./">
+      <img src="assets/perch-icon-appicon.png" alt="Sleepwing app icon">
+      Sleepwing
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="./#features"><span data-l="zh">功能</span><span data-l="en">Features</span></a>
+      <a href="./#tutorial"><span data-l="zh">教程</span><span data-l="en">Tutorials</span></a>
+      <a href="./#download"><span data-l="zh">下载</span><span data-l="en">Download</span></a>
+    </nav>
+    <button class="lang-btn" id="langToggle" type="button" aria-label="Switch language">
+      <span data-l="zh">EN</span><span data-l="en">中文</span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+<section>
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">宠物画廊</span><span data-l="en">Pet Gallery</span></span>
+    <h1>
+      <span data-l="zh">做一只属于你的桌面伙伴</span>
+      <span data-l="en">Make a companion that is yours</span>
+    </h1>
+    <p class="sub">
+      <span data-l="zh">Sleepwing 内置两只官方角色，但最好的桌宠也许是你自己的：一个角色创意、一张角色图，甚至一张你家宠物的照片，都可以变成完整的动画桌宠。做好之后，欢迎投稿到社区画廊。</span>
+      <span data-l="en">Sleepwing ships with two official characters, but the best companion might be your own: a character idea, character art, or even a photo of your real pet can become a fully animated companion. When it's done, share it with the community gallery.</span>
+    </p>
+  </div>
+</section>
+
+<section class="alt-bg">
+  <div class="wrap">
+    <h2><span data-l="zh">怎么制作</span><span data-l="en">How to make one</span></h2>
+    <p class="sub">
+      <span data-l="zh">制作在你自己的编程 Agent 里完成，Sleepwing 负责校验、导入和播放。全程本地，参考图与创意不会上传到任何服务器。</span>
+      <span data-l="en">Production happens inside your own coding agent; Sleepwing validates, imports, and plays the result. Everything stays local — your art and ideas are never uploaded.</span>
+    </p>
+    <div class="steps" style="margin-top:28px">
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">安装 perch-pet 技能</span><span data-l="en">Install the perch-pet skill</span></h3>
+        <p><span data-l="zh">打开 Sleepwing → Pet Studio，一键安装 App 自带的 <code>perch-pet</code> Agent 技能。只有用户环境中已安装 <code>hatch-pet</code> 时才会复用它。</span><span data-l="en">Open Sleepwing → Pet Studio and install the app-bundled <code>perch-pet</code> agent skill with one click. It reuses <code>hatch-pet</code> only when that optional skill is already installed.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">描述角色或给参考图</span><span data-l="en">Describe or show your character</span></h3>
+        <p><span data-l="zh">在 Agent 里描述外形、材质和性格，或提供参考图。Pet Studio 的「从照片开始」还能在本机把照片主体抠成干净的透明参考图。技能会产出完整的 8×11 动画图集。</span><span data-l="en">Describe the look, material, and personality in your agent, or supply reference art. Pet Studio's "Start from a photo" can lift the subject from a photo into clean transparent reference art, fully on device. The skill produces a complete 8×11 animation atlas.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">导入并预览</span><span data-l="en">Import and preview</span></h3>
+        <p><span data-l="zh">回到 Pet Studio 导入生成的 <code>.perchpet</code>。Sleepwing 会校验结构与素材、拒绝符号链接，然后用真实的待机动画实时预览。</span><span data-l="en">Import the generated <code>.perchpet</code> back in Pet Studio. Sleepwing validates structure and assets, rejects symbolic links, then previews the real idle motion live.</span></p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:18px">
+      <span data-l="zh">完整教程见首页的<a href="./#tutorial">「导入自定义桌宠」</a>一节。</span>
+      <span data-l="en">See <a href="./#tutorial">"Import a custom pet"</a> on the home page for the full walkthrough.</span>
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2><span data-l="zh">社区作品</span><span data-l="en">Community showcase</span></h2>
+    <div class="card empty" style="margin-top:24px">
+      <h3><span data-l="zh">画廊刚刚开放</span><span data-l="en">The gallery just opened</span></h3>
+      <p style="max-width:520px;margin:8px auto 20px">
+        <span data-l="zh">这里将展示社区制作的 .perchpet 角色。期待第一批作品——也许就是你的。</span>
+        <span data-l="en">Community-made .perchpet characters will be showcased here. The first submissions are welcome — maybe yours.</span>
+      </p>
+      <a class="btn btn-primary" href="https://github.com/lttxzmj/sleepwing/issues/new?title=%5BPet%20showcase%5D%20&labels=pet-showcase">
+        <span data-l="zh">投稿一只桌宠</span><span data-l="en">Submit a pet</span>
+      </a>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h3 style="font-size:1.05rem"><span data-l="zh">投稿方式与规则</span><span data-l="en">How to submit, and the rules</span></h3>
+      <ul>
+        <li><span data-l="zh">在 GitHub 提交一个标题以 <code>[Pet showcase]</code> 开头的 Issue，附上：角色名与一句话介绍、一张预览图（待机帧或动图）、可下载的 <code>.perchpet</code> 链接。</span><span data-l="en">Open a GitHub issue titled <code>[Pet showcase]</code> with: the character's name and a one-line intro, a preview image (idle frame or animation), and a downloadable <code>.perchpet</code> link.</span></li>
+        <li><span data-l="zh">必须是原创角色，或你拥有使用权的形象；不接受受版权保护的第三方角色。</span><span data-l="en">Original characters only, or art you have the rights to; no copyrighted third-party characters.</span></li>
+        <li><span data-l="zh">内容需适合所有年龄。</span><span data-l="en">Content must be appropriate for all ages.</span></li>
+        <li><span data-l="zh">你的作品版权归你：用户自制宠物属于创作者本人（见 <a href="https://github.com/lttxzmj/sleepwing/blob/main/LICENSE-ASSETS.md">素材许可</a>），入选画廊仅表示展示与链接。</span><span data-l="en">Your work stays yours: user-made pets belong to their creators (see the <a href="https://github.com/lttxzmj/sleepwing/blob/main/LICENSE-ASSETS.md">assets license</a>). Being featured only means we display and link to it.</span></li>
+      </ul>
+    </div>
+    <p class="note" style="margin-top:18px">
+      <span data-l="zh">Sleepwing 应用本体不联网：画廊只存在于这个网站，下载的素材包始终由你在 Pet Studio 中手动导入并经过完整校验。</span>
+      <span data-l="en">The Sleepwing app itself makes no network connections: the gallery lives only on this site, and downloaded packages are always imported manually through Pet Studio with full validation.</span>
+    </p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0">
+      <span data-l="zh"><a href="./">← 返回 Sleepwing 首页</a> · 唯一官方网站：lttxzmj.github.io/sleepwing</span>
+      <span data-l="en"><a href="./">← Back to Sleepwing</a> · The only official website: lttxzmj.github.io/sleepwing</span>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const saved = localStorage.getItem("perch-lang");
+  const auto = (navigator.language || "zh").toLowerCase().startsWith("zh") ? "zh" : "en";
+  setLang(saved === "zh" || saved === "en" ? saved : auto);
+
+  document.getElementById("langToggle").addEventListener("click", function () {
+    const next = document.documentElement.dataset.lang === "zh" ? "en" : "zh";
+    localStorage.setItem("perch-lang", next);
+    setLang(next);
+  });
+
+  function setLang(lang) {
+    document.documentElement.dataset.lang = lang;
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
+    document.title = lang === "zh"
+      ? "Sleepwing 宠物画廊 — 制作并分享你的桌面伙伴"
+      : "Sleepwing Pet Gallery — Make and share your companion";
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,4 @@
+/* 系统权限弹窗。弹窗本身由 macOS 按系统语言绘制，所以每条说明只能是一种
+   语言：中英拼在同一个字符串里，会在同一个对话框里同时出现。 */
+"NSMicrophoneUsageDescription" = "只有你主动开口时 Perch 才聆听——按住桌宠，或点一下麦克风。语音在这台 Mac 上识别，不会离开本机。";
+"NSSpeechRecognitionUsageDescription" = "你说的话完全在这台 Mac 上转成文字，不会发送到任何服务器。";

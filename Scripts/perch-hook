@@ -1,0 +1,38 @@
+#!/bin/sh
+# Usage: perch-hook claude|cursor|codex|opencode|gemini|trae|pi
+# Reads the provider hook JSON from stdin. Delivery is deliberately best-effort:
+# a stopped Perch app must never delay or break an agent.
+provider="$1"
+case "$provider" in
+  claude|cursor|codex|opencode|gemini|trae|pi) ;;
+  *) exit 0 ;;
+esac
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+project_dir=$(CDPATH= cd -- "$script_dir/.." && pwd)
+sanitizer="$project_dir/.build/debug/PerchRelay"
+if [ ! -x "$sanitizer" ]; then
+  sanitizer="$HOME/Library/Application Support/Perch/bin/perch-relay"
+fi
+[ -x "$sanitizer" ] || exit 0
+token_file="$HOME/Library/Application Support/Perch/token"
+token=$(cat "$token_file" 2>/dev/null)
+[ -n "$token" ] || exit 0
+
+if [ "$#" -ge 2 ]; then
+  canonical=$("$sanitizer" "$provider" "$2" 2>/dev/null)
+else
+  canonical=$("$sanitizer" "$provider" 2>/dev/null)
+fi
+[ -n "$canonical" ] || exit 0
+
+/usr/bin/curl \
+  --silent \
+  --max-time 0.12 \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --header "X-Perch-Token: $token" \
+  --data-binary "$canonical" \
+  "http://127.0.0.1:7534/v1/events/$provider" >/dev/null 2>&1 || true
+
+exit 0

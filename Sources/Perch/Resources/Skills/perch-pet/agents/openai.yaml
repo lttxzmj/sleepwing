@@ -1,0 +1,4 @@
+interface:
+  display_name: "Perch Pet"
+  short_description: "Create a validated animated companion package for Perch"
+  default_prompt: "Use $perch-pet to classify this host's production capability, then create or validate an animated companion package I can import into Perch."

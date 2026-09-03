@@ -1,0 +1,32 @@
+# Sleepwing
+
+> Sleepwing is a privacy-first macOS desktop health companion. One desktop pet watches your local AI coding agents at work, turns verified agent work time into bounded health breaks (hydrate, stretch, look away), and recalls you the moment an agent needs your input. Everything runs locally: no account, no telemetry, no server side.
+
+## Key facts
+
+- Formerly developed under the codename Perch; Sleepwing is the same product and the only official continuation. Internal module names in the source keep the Perch codename.
+- Platform: macOS 14 or later, Apple Silicon only (public beta). Intel is not claimed.
+- Price: free public beta. Download: https://github.com/lttxzmj/sleepwing/releases
+- Supported agent surfaces (official local hooks/plugins only): Claude Code, Cursor IDE/CLI, ChatGPT desktop / Codex CLI / IDE, OpenCode, Gemini CLI, TRAE IDE, pi coding agent. Cloud agents and ordinary ChatGPT chats are out of scope.
+- Privacy: hook events are sanitized locally before reaching Sleepwing. Only provider name, opaque session ID, lifecycle phase, timestamp, an optional task label (≤60 chars, expires with the session), and an allowlisted local resume route are transmitted. Prompts, code, tool inputs/outputs, error bodies, and full paths never enter Sleepwing. Sleepwing listens only on loopback (127.0.0.1); the app makes no outbound network requests — no telemetry, no analytics, no automatic update checks. Optional pet chat is fully local by default; an explicit user setting can route typed chat through the user's own local agent CLI instead.
+- Hook delivery is best-effort and never blocks or slows the host agent, even when Sleepwing is not running.
+- One companion only: any number of agents map to a single desktop pet; per-task detail lives in the menu bar task inbox.
+- Health breaks are bounded: hourly cap, quiet hours, 10-minute snoozes, paused while an agent is waiting for you. No rankings, no streaks, no screen-time rewards.
+- Pet Studio: import custom pets as validated `.perchpet` packages created with the `perch-pet` agent skill.
+
+## Official channels
+
+- Official website: https://lttxzmj.github.io/sleepwing/ (the only official site).
+- Official downloads: GitHub Releases at https://github.com/lttxzmj/sleepwing/releases only.
+- No other website, mirror, or installer source is official or affiliated with Sleepwing.
+
+## Links
+
+- Landing page: https://lttxzmj.github.io/sleepwing/
+- Pet gallery and submission guide: https://lttxzmj.github.io/sleepwing/gallery.html
+- Repository: https://github.com/lttxzmj/sleepwing
+- Privacy policy: https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.md
+- Security policy: https://github.com/lttxzmj/sleepwing/blob/main/SECURITY.md
+- Changelog: https://github.com/lttxzmj/sleepwing/blob/main/CHANGELOG.md
+- Uninstall guide: https://github.com/lttxzmj/sleepwing/blob/main/docs/UNINSTALL.md
+- Issues / feedback: https://github.com/lttxzmj/sleepwing/issues

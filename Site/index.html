@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" data-lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleepwing — AI 干活，你歇会儿。</title>
+<meta name="description" content="Sleepwing 是一款隐私优先的 macOS 桌面健康陪伴应用：一只桌宠替你盯着本地 AI 编程 Agent，把 AI 工作时间还给你的身体，需要你时再叫你回来。">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:url" content="https://lttxzmj.github.io/sleepwing/">
+<meta property="og:title" content="Sleepwing — AI 干活，你歇会儿。">
+<meta property="og:description" content="Privacy-first macOS desktop companion that watches your local AI coding agents while you take a real break.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="1024">
+<meta property="og:image:alt" content="Sleepwing app icon — the calm mascot bird on a mint background">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Sleepwing — AI 干活，你歇会儿。">
+<meta name="twitter:description" content="Privacy-first macOS desktop companion that watches your local AI coding agents while you take a real break.">
+<meta name="twitter:image" content="https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<link rel="apple-touch-icon" href="assets/perch-icon-appicon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Sleepwing",
+  "url": "https://lttxzmj.github.io/sleepwing/",
+  "image": "https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png",
+  "description": "隐私优先的 macOS 桌面健康陪伴应用：一只桌宠在本地监看你的 AI 编程 Agent，把 AI 工作时间变成有边界的休息机会，Agent 需要你时第一时间叫你回来。Privacy-first macOS desktop companion that watches local AI coding agents while you take a real break.",
+  "operatingSystem": "macOS 14.0 or later (Apple Silicon)",
+  "applicationCategory": "HealthApplication",
+  "inLanguage": ["zh-Hans", "en"],
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "downloadUrl": "https://github.com/lttxzmj/sleepwing/releases",
+  "author": { "@type": "Organization", "name": "Sleepwing", "url": "https://github.com/lttxzmj/sleepwing" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "我的代码或提示词会被上传吗？", "acceptedAnswer": { "@type": "Answer", "text": "不会。Sleepwing 没有服务器端，不要求账户。钩子事件在进入 Sleepwing 之前先在本地脱敏，提示词、代码、工具输入输出和完整路径在传输前就被丢弃，桌宠与统计只依赖生命周期元数据。" } },
+    { "@type": "Question", "name": "支持 Intel Mac 吗？", "acceptedAnswer": { "@type": "Answer", "text": "当前公开测试版仅支持 macOS 14 及以上的 Apple Silicon Mac。在通用构建通过同样的验收测试之前，不声称兼容 Intel。" } },
+    { "@type": "Question", "name": "会拖慢我的 Agent 吗？", "acceptedAnswer": { "@type": "Answer", "text": "钩子投递是尽力而为的：即使 Sleepwing 没有运行，钩子也会立刻静默返回，绝不阻塞或影响宿主 Agent。" } },
+    { "@type": "Question", "name": "能同时显示多只桌宠吗？", "acceptedAnswer": { "@type": "Answer", "text": "不能，这是有意的设计。无论连接多少个 Agent，桌面上始终只有一只伙伴代表全部状态，精确的分任务状态在菜单栏的任务收件箱里。" } },
+    { "@type": "Question", "name": "健康提醒会不会很吵？", "acceptedAnswer": { "@type": "Answer", "text": "不会。提醒只在经验证的 Agent 工作时间达到阈值后出现，有每小时上限、勿扰时段和 10 分钟稍后提醒；没有排名、没有连续打卡、不奖励屏幕时间。" } },
+    { "@type": "Question", "name": "如何反馈问题或报告安全漏洞？", "acceptedAnswer": { "@type": "Answer", "text": "一般问题请提交 GitHub Issues；安全漏洞请使用仓库的私密安全通告渠道，不要在公开 Issue 中包含令牌、私有提示词或个人数据。" } }
+  ]
+}
+</script>
+<style>
+:root{
+  --teal:#2F8879; --ink:#173F38; --amber:#F3A33A; --mint:#D8EBE3;
+  --green:#338761; --wait:#D16E1F; --blue:#4563B8; --red:#B8312E; --gray:#575F6B;
+  --bg:#FBFCFB; --surface:#FFFFFF; --surface-2:#F2F6F4; --border:#E2E9E6;
+  --text:#1C2422; --text-2:#575F6B; --link:#2F8879;
+  --radius:12px; --radius-lg:20px;
+  --shadow:0 1px 2px rgba(23,63,56,.06),0 4px 16px rgba(23,63,56,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#121716; --surface:#1A211F; --surface-2:#202826; --border:#2C3634;
+    --text:#E8EEEC; --text-2:#9AA6A2; --link:#5FB7A6; --mint:#1F3730;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *{animation:none!important;transition:none!important} }
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue","Segoe UI",Roboto,"Noto Sans SC",sans-serif;
+  font-size:16px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+[data-lang="zh"] [data-l="en"]{display:none!important}
+[data-lang="en"] [data-l="zh"]{display:none!important}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:4px}
+code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.875em;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:.1em .4em}
+pre{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:none;padding:0}
+.ico{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;display:inline-block;vertical-align:-.125em}
+.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+section{padding:72px 0}
+h1,h2,h3{line-height:1.25;margin:0 0 .5em}
+h2{font-size:1.75rem;letter-spacing:-.01em}
+.kicker{display:block;font-size:.8125rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.sub{color:var(--text-2);max-width:640px;margin:0 0 8px}
+
+/* header */
+header.site{
+  position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);
+  backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.nav{display:flex;align-items:center;gap:20px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;color:var(--text)}
+.brand img{width:30px;height:30px;border-radius:7px}
+.nav-links{display:flex;gap:18px;margin-left:auto;font-size:.9rem}
+.nav-links a{color:var(--text-2)}
+.nav-links a:hover{color:var(--text);text-decoration:none}
+.lang-btn{
+  border:1px solid var(--border);background:var(--surface);color:var(--text);
+  border-radius:999px;padding:5px 14px;font-size:.85rem;cursor:pointer;
+}
+.lang-btn:hover{border-color:var(--teal);color:var(--teal)}
+@media (max-width:760px){.nav-links{display:none}}
+
+/* hero */
+.hero{padding:96px 0 80px;text-align:center;position:relative;overflow:hidden}
+.hero::before{
+  content:"";position:absolute;inset:auto 0 -40% 0;height:70%;
+  background:radial-gradient(60% 100% at 50% 100%, color-mix(in srgb,var(--teal) 10%,transparent), transparent 70%);
+  pointer-events:none;
+}
+.hero img.icon{width:120px;height:120px;border-radius:28px;box-shadow:var(--shadow);margin-bottom:28px}
+.hero h1{font-size:clamp(2rem,5.5vw,3.25rem);letter-spacing:-.02em;margin-bottom:16px}
+.hero .tag{color:var(--text-2);font-size:1.15rem;max-width:620px;margin:0 auto 34px}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;border-radius:999px;
+  padding:4px 14px;font-size:.8125rem;font-weight:600;margin-bottom:22px;
+  background:color-mix(in srgb,var(--amber) 16%,var(--surface));color:var(--wait);
+  border:1px solid color-mix(in srgb,var(--amber) 40%,transparent);
+}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;border-radius:10px;
+  padding:12px 26px;font-size:1rem;font-weight:600;border:1px solid transparent;cursor:pointer;
+}
+.btn-primary{background:var(--teal);color:#fff}
+.btn-primary:hover{background:var(--ink);text-decoration:none}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border)}
+.btn-secondary:hover{border-color:var(--teal);color:var(--teal);text-decoration:none}
+.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed}
+.btn .ico{font-size:17px}
+.req-line{font-size:.875rem;color:var(--text-2)}
+.req-line strong{color:var(--text);font-weight:600}
+
+/* feature grid */
+.grid{display:grid;gap:18px}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:860px){.grid.cols-3{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.grid.cols-3,.grid.cols-2{grid-template-columns:1fr}}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:24px;position:relative;
+  --accent:var(--teal);--accent-ink:var(--accent);
+}
+.card::before{content:"";position:absolute;top:0;left:24px;right:24px;height:2px;border-radius:0 0 2px 2px;background:var(--accent);opacity:.55}
+.card.accent-amber{--accent:var(--amber);--accent-ink:var(--wait)}
+.card.accent-green{--accent:var(--green)}
+.card.accent-blue{--accent:var(--blue)}
+.card.accent-gray{--accent:var(--gray)}
+.card h3{font-size:1.05rem;margin:0 0 6px}
+.card p{margin:0;color:var(--text-2);font-size:.925rem}
+.card .glyph{
+  width:40px;height:40px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
+  color:var(--accent-ink);
+  background:color-mix(in srgb,var(--accent) 12%,transparent);
+  border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+}
+.card .glyph .ico{font-size:20px}
+
+/* steps */
+.steps{counter-reset:step;display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px}
+.step .n{
+  counter-increment:step;display:inline-flex;width:30px;height:30px;border-radius:999px;
+  background:var(--mint);color:var(--ink);font-weight:700;align-items:center;justify-content:center;margin-bottom:12px;
+}
+@media (prefers-color-scheme: dark){
+  .step .n{color:#8FD4C5}
+  .card{--accent-ink:color-mix(in srgb,var(--accent) 70%,white)}
+  .card.accent-amber{--accent-ink:color-mix(in srgb,var(--amber) 85%,white)}
+}
+.step .n::before{content:counter(step)}
+.step h3{font-size:1rem}
+.step p{color:var(--text-2);font-size:.925rem;margin:0}
+
+/* table */
+.table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:640px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface-2);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td:first-child{font-weight:600;white-space:nowrap}
+
+/* tutorial accordions */
+details{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  margin-bottom:12px;padding:0 20px;
+}
+details[open]{border-color:color-mix(in srgb,var(--teal) 45%,var(--border))}
+summary{
+  cursor:pointer;font-weight:600;padding:16px 0;list-style:none;
+  display:flex;align-items:center;gap:10px;
+}
+summary::-webkit-details-marker{display:none}
+summary::after{
+  content:"";margin-left:auto;flex:none;width:16px;height:16px;background:var(--text-2);
+  -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>") center/16px 16px no-repeat;
+  mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>") center/16px 16px no-repeat;
+  transition:transform .2s ease;
+}
+details[open] summary::after{transform:rotate(180deg);background:var(--teal)}
+details .body{padding:0 0 18px;color:var(--text-2);font-size:.925rem}
+details .body p{margin:0 0 10px}
+details .body ol,details .body ul{margin:0 0 10px;padding-left:22px}
+details .body li{margin-bottom:4px}
+
+/* privacy */
+.priv{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:700px){.priv{grid-template-columns:1fr}}
+.priv .card ul{margin:0;padding-left:20px;color:var(--text-2);font-size:.925rem}
+.priv .card li{margin-bottom:6px}
+.priv .card h3{display:flex;align-items:center;gap:8px}
+.priv .card h3 .ico{font-size:19px;stroke-width:2}
+.ok-title{color:var(--green)} .no-title{color:var(--red)}
+@media (prefers-color-scheme: dark){.ok-title{color:#5CBB8E} .no-title{color:#E06B67}}
+
+/* download */
+#download .panel{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:36px;box-shadow:var(--shadow);
+}
+.dl-meta{display:flex;flex-wrap:wrap;gap:10px 24px;font-size:.9rem;color:var(--text-2);margin:14px 0 22px}
+.dl-meta strong{color:var(--text)}
+.sha{
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:.8rem;word-break:break-all;
+  background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-top:16px;color:var(--text-2);
+}
+.doc-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.doc-links a{
+  font-size:.85rem;border:1px solid var(--border);border-radius:999px;padding:6px 14px;color:var(--text-2);background:var(--surface);
+}
+.doc-links a:hover{color:var(--teal);border-color:var(--teal);text-decoration:none}
+.limit-list{margin:14px 0 0;padding-left:20px;color:var(--text-2);font-size:.925rem}
+.limit-list li{margin-bottom:6px}
+
+/* faq */
+.faq details{background:var(--surface)}
+
+/* footer */
+footer{border-top:1px solid var(--border);padding:40px 0 56px;color:var(--text-2);font-size:.875rem}
+footer .cols{display:flex;flex-wrap:wrap;gap:16px 32px;justify-content:space-between;align-items:flex-start}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 20px}
+footer a{color:var(--text-2)} footer a:hover{color:var(--teal)}
+.alt-bg{background:var(--surface-2)}
+</style>
+</head>
+<body>
+
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <symbol id="i-bird" viewBox="0 0 24 24"><path d="M16 7h.01"/><path d="M3.4 18H12a8 8 0 0 0 8-8V7a4 4 0 0 0-7.28-2.3L2 20"/><path d="m20 7 2 .5-2 .5"/><path d="M10 18v3"/><path d="M14 17.75V21"/><path d="M7 18a6 6 0 0 0 3.84-10.61"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 22a1 1 0 0 1 0-20 10 9 0 0 1 10 9 5 5 0 0 1-5 5h-2.25a1.75 1.75 0 0 0-1.4 2.8l.3.4a1.75 1.75 0 0 1-1.4 2.8z"/><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></symbol>
+  </defs>
+</svg>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="brand" href="#top">
+      <img src="assets/perch-icon-appicon.png" alt="Sleepwing app icon">
+      Sleepwing
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features"><span data-l="zh">功能</span><span data-l="en">Features</span></a>
+      <a href="#how"><span data-l="zh">工作原理</span><span data-l="en">How it works</span></a>
+      <a href="#integrations"><span data-l="zh">支持的 Agent</span><span data-l="en">Integrations</span></a>
+      <a href="#tutorial"><span data-l="zh">教程</span><span data-l="en">Tutorials</span></a>
+      <a href="gallery.html"><span data-l="zh">画廊</span><span data-l="en">Gallery</span></a>
+      <a href="#privacy"><span data-l="zh">隐私</span><span data-l="en">Privacy</span></a>
+      <a href="#faq">FAQ</a>
+      <a href="#download"><span data-l="zh">下载</span><span data-l="en">Download</span></a>
+    </nav>
+    <button class="lang-btn" id="langToggle" type="button" aria-label="Switch language">
+      <span data-l="zh">EN</span><span data-l="en">中文</span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- Hero -->
+<section class="hero">
+  <div class="wrap">
+    <img class="icon" src="assets/perch-icon-appicon.png" alt="" width="120" height="120">
+    <div><span class="badge">
+      <span data-l="zh">公开测试版 Beta · macOS 14+ · Apple Silicon</span>
+      <span data-l="en">Public Beta · macOS 14+ · Apple Silicon</span>
+    </span></div>
+    <h1>
+      <span data-l="zh">AI 干活，你歇会儿。</span>
+      <span data-l="en">When AI does the work,<br>take the break back.</span>
+    </h1>
+    <p class="tag">
+      <span data-l="zh">Sleepwing 是一只安静的桌面伙伴。它在本地看着你的 AI 编程 Agent 干活，把这段时间变成有边界的休息机会；当 Agent 需要你时，第一时间把你叫回来。</span>
+      <span data-l="en">Sleepwing is a quiet desktop companion. It locally watches your AI coding agents at work, turns that time into bounded health breaks, and calls you back the moment an agent needs your input.</span>
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" id="downloadCta" href="#download">
+        <svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>
+        <span data-l="zh">下载 Sleepwing Beta</span><span data-l="en">Download Sleepwing Beta</span>
+      </a>
+      <a class="btn btn-secondary" href="#tutorial">
+        <span data-l="zh">查看接入教程</span><span data-l="en">Setup tutorials</span>
+      </a>
+    </div>
+    <p class="req-line">
+      <span data-l="zh"><strong>全部本地运行</strong> · 无账户 · 无遥测 · 提示词与代码永不离开你的 Mac</span>
+      <span data-l="en"><strong>Runs fully local</strong> · No account · No telemetry · Prompts and code never leave your Mac</span>
+    </p>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="alt-bg">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">功能</span><span data-l="en">Features</span></span>
+    <h2>
+      <span data-l="zh">一只桌宠，看着你所有的 Agent</span>
+      <span data-l="en">One companion for every agent</span>
+    </h2>
+    <p class="sub">
+      <span data-l="zh">Sleepwing 不做监控面板，也不做游戏化桌宠。它安静、温暖、克制——像 macOS 原生工具一样可信。</span>
+      <span data-l="en">Sleepwing is not a monitoring dashboard or a gamified toy. It is quiet, warm, and restrained — as trustworthy as a native macOS utility.</span>
+    </p>
+    <div class="grid cols-3" style="margin-top:34px">
+      <div class="card">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-bird"/></svg></span>
+        <h3><span data-l="zh">统一的桌面伙伴</span><span data-l="en">One shared companion</span></h3>
+        <p><span data-l="zh">无论连接多少个 Agent，桌面上只有一只伙伴。它有休息、工作、等待、庆祝等独立状态，支持三种尺寸、多显示器位置记忆和减弱动态。</span><span data-l="en">No matter how many agents you connect, there is exactly one companion — with distinct resting, working, attention, and celebration states, three sizes, per-display position restore, and Reduce Motion support.</span></p>
+      </div>
+      <div class="card accent-amber">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-bell"/></svg></span>
+        <h3><span data-l="zh">需要你时叫你回来</span><span data-l="en">Recall when needed</span></h3>
+        <p><span data-l="zh">Agent 等待授权或输入时，Sleepwing 通过桌宠气泡和可操作的系统通知召回你，一键返回对应任务。</span><span data-l="en">When an agent waits for permission or input, Sleepwing recalls you with a companion bubble and actionable system notifications — one click returns you to that task.</span></p>
+      </div>
+      <div class="card accent-green">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-heart"/></svg></span>
+        <h3><span data-l="zh">有边界的健康提醒</span><span data-l="en">Bounded health breaks</span></h3>
+        <p><span data-l="zh">只有经验证的 Agent 工作时间才会变成休息机会：喝水、拉伸、远眺。并行任务只计一次，等待你时自动暂停，支持勿扰时段和 10 分钟稍后提醒。</span><span data-l="en">Only verified agent work time becomes break opportunities — hydrate, stretch, look away. Parallel work counts once, timing pauses while you are needed, with quiet hours and durable 10-minute snoozes.</span></p>
+      </div>
+      <div class="card accent-blue">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-inbox"/></svg></span>
+        <h3><span data-l="zh">隐私安全的任务收件箱</span><span data-l="en">Privacy-safe task inbox</span></h3>
+        <p><span data-l="zh">菜单栏展示每个会话的运行时长、等待状态和返回操作——只基于脱敏的生命周期事件，不含任何提示词或代码。</span><span data-l="en">The menu bar shows each session's running time, attention state, and return action — built only on sanitized lifecycle events, never prompts or code.</span></p>
+      </div>
+      <div class="card accent-gray">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-chart"/></svg></span>
+        <h3><span data-l="zh">本地统计</span><span data-l="en">Local statistics</span></h3>
+        <p><span data-l="zh">今日与近七天的休息完成情况、找回的时间、完成任务数——全部保存在本机，不做排名，不制造焦虑。</span><span data-l="en">Daily and seven-day breaks completed, time reclaimed, and finished-task counts — all stored locally. No rankings, no pressure.</span></p>
+      </div>
+      <div class="card">
+        <span class="glyph" aria-hidden="true"><svg class="ico"><use href="#i-palette"/></svg></span>
+        <h3><span data-l="zh">Pet Studio 自定义桌宠</span><span data-l="en">Pet Studio</span></h3>
+        <p><span data-l="zh">内置两只官方角色；也可以用 Agent 技能 <code>perch-pet</code> 把你的角色创意做成 <code>.perchpet</code> 素材包，经校验后导入并实时预览。</span><span data-l="en">Two built-in characters, plus the <code>perch-pet</code> agent skill that turns your character ideas into validated <code>.perchpet</code> packages you can import and preview live.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">工作原理</span><span data-l="en">How it works</span></span>
+    <h2>
+      <span data-l="zh">三步开始，全程本地</span>
+      <span data-l="en">Three steps, fully local</span>
+    </h2>
+    <div class="steps" style="margin-top:34px">
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">连接你的 Agent</span><span data-l="en">Connect your agents</span></h3>
+        <p><span data-l="zh">在 Sleepwing 的「连接」页面一键安装官方生命周期钩子。安装可逆、可回滚，只改动 Sleepwing 自己拥有的条目，绝不覆盖你已有的配置。</span><span data-l="en">Install official lifecycle hooks with one click from Sleepwing's Integrations page. Installs are reversible, touch only Sleepwing-owned entries, and never overwrite your existing configuration.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">Agent 干活，你休息</span><span data-l="en">Agents work, you rest</span></h3>
+        <p><span data-l="zh">事件在进入 Sleepwing 之前先在本地脱敏：只保留平台名、不透明会话 ID、阶段、时间戳和一个不超过 60 字符的任务名。桌宠进入工作状态，健康计时开始。</span><span data-l="en">Events are sanitized locally before they reach Sleepwing: only provider, opaque session ID, phase, timestamp, and a task label capped at 60 characters. The companion starts working; break timing begins.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">该你了，回来</span><span data-l="en">Your turn — come back</span></h3>
+        <p><span data-l="zh">Agent 需要授权、完成任务或出错时，Sleepwing 用气泡和通知告诉你，并提供一键返回。庆祝很短，肯定很轻。</span><span data-l="en">When an agent needs permission, finishes, or fails, Sleepwing tells you with a bubble and a notification, plus a one-click return. Celebrations are brief; affirmation is light.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Integrations -->
+<section id="integrations" class="alt-bg">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">支持的 Agent</span><span data-l="en">Integrations</span></span>
+    <h2>
+      <span data-l="zh">七个本地 Agent 平台</span>
+      <span data-l="en">Seven local agent surfaces</span>
+    </h2>
+    <p class="sub">
+      <span data-l="zh">全部基于各平台的官方本地钩子或插件机制。云端 Agent 与普通 ChatGPT 聊天不在支持范围内。</span>
+      <span data-l="en">All built on each platform's official local hook or plugin mechanism. Cloud agents and ordinary ChatGPT conversations are out of scope.</span>
+    </p>
+    <div class="table-scroll" style="margin-top:30px">
+      <table>
+        <thead>
+          <tr>
+            <th><span data-l="zh">平台</span><span data-l="en">Surface</span></th>
+            <th><span data-l="zh">Beta 支持</span><span data-l="en">Beta support</span></th>
+            <th><span data-l="zh">边界说明</span><span data-l="en">Boundary</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Claude Code</td>
+            <td><span data-l="zh">本地生命周期钩子</span><span data-l="en">Local lifecycle hooks</span></td>
+            <td><span data-l="zh">仅限本地会话</span><span data-l="en">Local sessions only</span></td>
+          </tr>
+          <tr>
+            <td>Cursor IDE / CLI</td>
+            <td><span data-l="zh">本地 Agent 钩子</span><span data-l="en">Local agent hooks</span></td>
+            <td><span data-l="zh">云端 Agent 不在支持范围</span><span data-l="en">Cloud agents remain out of scope</span></td>
+          </tr>
+          <tr>
+            <td>ChatGPT / Codex</td>
+            <td><span data-l="zh">当前 Codex 生命周期钩子；旧版 <code>notify</code> 仅报告完成</span><span data-l="en">Current Codex lifecycle hooks; legacy <code>notify</code> is completion-only</span></td>
+            <td><span data-l="zh">首次安装可能需要 <code>/hooks</code> 信任确认；普通聊天不是生命周期任务</span><span data-l="en">First install may require <code>/hooks</code> trust; ordinary chats are not lifecycle tasks</span></td>
+          </tr>
+          <tr>
+            <td>OpenCode</td>
+            <td><span data-l="zh">官方本地插件生命周期事件</span><span data-l="en">Official local plugin lifecycle events</span></td>
+            <td><span data-l="zh">连接后需重启 OpenCode</span><span data-l="en">Restart OpenCode after connecting</span></td>
+          </tr>
+          <tr>
+            <td>Gemini CLI</td>
+            <td><span data-l="zh">官方本地钩子</span><span data-l="en">Official local hooks</span></td>
+            <td><span data-l="zh">事件在本地脱敏后才进入 Sleepwing</span><span data-l="en">Events are sanitized locally before reaching Sleepwing</span></td>
+          </tr>
+          <tr>
+            <td>TRAE IDE</td>
+            <td><span data-l="zh">官方本地钩子</span><span data-l="en">Official local hooks</span></td>
+            <td><span data-l="zh">支持国际版与国内版配置路径</span><span data-l="en">International and China config paths supported</span></td>
+          </tr>
+          <tr>
+            <td>pi coding agent</td>
+            <td><span data-l="zh">官方本地扩展生命周期</span><span data-l="en">Official local extension lifecycle</span></td>
+            <td><span data-l="zh">仅限本地会话</span><span data-l="en">Local sessions only</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sub" style="margin-top:16px;font-size:.875rem">
+      <span data-l="zh">如果某个平台不提供某种生命周期状态，Sleepwing 会如实说明，绝不模拟不存在的状态，也不会把内容为空的连通性检查当作真实活动展示。</span>
+      <span data-l="en">If a provider does not expose a lifecycle state, Sleepwing says so. It never simulates unavailable states or presents a content-free connectivity check as real activity.</span>
+    </p>
+  </div>
+</section>
+
+<!-- Tutorials -->
+<section id="tutorial">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">教程</span><span data-l="en">Tutorials</span></span>
+    <h2>
+      <span data-l="zh">从安装到卸载的完整指南</span>
+      <span data-l="en">From install to uninstall</span>
+    </h2>
+
+    <h3 style="margin-top:34px">
+      <span data-l="zh">快速开始</span><span data-l="en">Quick start</span>
+    </h3>
+    <div class="steps" style="grid-template-columns:repeat(2,1fr);margin-top:18px">
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">下载并打开</span><span data-l="en">Download and open</span></h3>
+        <p><span data-l="zh">下载 ZIP，核对下方的 SHA-256 校验值，解压后把 Sleepwing.app 拖入「应用程序」并打开。正式发布版已经过 Apple 公证，无需绕过任何 Gatekeeper 提示。</span><span data-l="en">Download the ZIP, verify the SHA-256 below, unzip, drag Sleepwing.app into Applications, and open it. Release builds are Apple-notarized — no Gatekeeper workarounds needed.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">完成引导</span><span data-l="en">Finish onboarding</span></h3>
+        <p><span data-l="zh">首次启动会引导你选择角色、预览桌宠状态。可以按需开启「登录时启动」，Sleepwing 会指引你完成 macOS 的授权确认。</span><span data-l="en">First launch walks you through character selection and live state previews. Optionally enable Launch at Login — Sleepwing guides you through the macOS approval state.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">连接 Agent</span><span data-l="en">Connect agents</span></h3>
+        <p><span data-l="zh">打开菜单栏 Sleepwing →「连接」，为你使用的 Agent 点击「安装」。任何配置改动只在你按下安装后发生，并且随时可以在同一页面移除。</span><span data-l="en">Open menu bar Sleepwing → Integrations and press Install for the agents you use. Configuration changes happen only after you press Install, and are removable from the same page.</span></p>
+      </div>
+      <div class="step">
+        <span class="n" aria-hidden="true"></span>
+        <h3><span data-l="zh">授权通知</span><span data-l="en">Allow notifications</span></h3>
+        <p><span data-l="zh">允许通知，以便 Agent 需要你时收到可操作的横幅提醒。Sleepwing 会区分「已授权」与「横幅是否真正可见」，并在设置里给出修复指引。</span><span data-l="en">Allow notifications so you get actionable banners when an agent needs you. Sleepwing distinguishes authorization from banner visibility and offers fix-it guidance in Settings.</span></p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px">
+      <span data-l="zh">各平台接入说明</span><span data-l="en">Per-platform notes</span>
+    </h3>
+    <p class="sub" style="font-size:.925rem">
+      <span data-l="zh">以下操作都可以在 Sleepwing 的「连接」页面一键完成，这里说明各平台的机制与注意事项。</span>
+      <span data-l="en">Everything below is one click on Sleepwing's Integrations page; these notes explain each platform's mechanism and caveats.</span>
+    </p>
+
+    <details>
+      <summary>Claude Code</summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 将命令钩子合并进 <code>~/.claude/settings.json</code>，覆盖 <code>UserPromptSubmit</code>、<code>PreToolUse</code>、<code>PermissionRequest</code>、<code>PostToolUse</code>、<code>Notification</code>、<code>Stop</code>、<code>StopFailure</code> 和 <code>SessionEnd</code> 事件。你已有的其他钩子会被完整保留。</span><span data-l="en">Sleepwing merges command hooks into <code>~/.claude/settings.json</code> covering <code>UserPromptSubmit</code>, <code>PreToolUse</code>, <code>PermissionRequest</code>, <code>PostToolUse</code>, <code>Notification</code>, <code>Stop</code>, <code>StopFailure</code>, and <code>SessionEnd</code>. Your existing hooks are fully preserved.</span></p>
+        <p><span data-l="zh">通知事件只响应权限请求、空闲等待和补充信息弹窗；失败不会被误报为完成。</span><span data-l="en">Notification events respond only to permission prompts, idle prompts, and elicitation dialogs; a failure is never misreported as completion.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Cursor IDE / CLI</summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 将钩子写入 <code>~/.cursor/hooks.json</code>，监听 <code>beforeSubmitPrompt</code>、<code>preToolUse</code>、<code>postToolUse</code>、<code>afterAgentResponse</code>、<code>stop</code> 和 <code>sessionEnd</code>，并保留你已有的钩子命令。</span><span data-l="en">Sleepwing writes hooks into <code>~/.cursor/hooks.json</code> for <code>beforeSubmitPrompt</code>, <code>preToolUse</code>, <code>postToolUse</code>, <code>afterAgentResponse</code>, <code>stop</code>, and <code>sessionEnd</code>, preserving your existing hook commands.</span></p>
+        <p><span data-l="zh">桌面版已完成端到端验证；Cursor CLI 与云端 Agent 的钩子覆盖随版本变化，云端 Agent 不在支持范围。</span><span data-l="en">The desktop app is verified end to end; Cursor CLI hook coverage varies across releases, and cloud agents are out of scope.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary><span data-l="zh">ChatGPT 桌面版 / Codex CLI / IDE</span><span data-l="en">ChatGPT desktop / Codex CLI / IDE</span></summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 安装当前的 Codex 生命周期钩子（<code>SessionStart</code>、<code>UserPromptSubmit</code>、<code>PreToolUse</code>、<code>PermissionRequest</code>、<code>PostToolUse</code>、<code>Stop</code>、<code>SessionEnd</code>）。旧版顶层 <code>notify</code> 仅作为「完成时通知」的兼容路径：如果你已有通知器，Sleepwing 会用包装器串联它，移除时原样恢复。</span><span data-l="en">Sleepwing installs current Codex lifecycle hooks (<code>SessionStart</code>, <code>UserPromptSubmit</code>, <code>PreToolUse</code>, <code>PermissionRequest</code>, <code>PostToolUse</code>, <code>Stop</code>, <code>SessionEnd</code>). The legacy top-level <code>notify</code> remains a completion-only compatibility path: an existing notifier is chained through a wrapper and restored on removal.</span></p>
+        <p><span data-l="zh">首次安装后可能需要在 Codex 中执行 <code>/hooks</code> 完成信任确认。<code>Stop</code> 只是轮次边界——Sleepwing 会等待 5 秒安静窗口再展示完成，任何续接的工作会立即取消待展示的完成状态。普通 ChatGPT 聊天没有任务生命周期，不会出现在 Sleepwing 中。</span><span data-l="en">After first install you may need to run <code>/hooks</code> in Codex to confirm trust. <code>Stop</code> is only a turn boundary — Sleepwing waits for a five-second quiet window before showing completion, and any resumed work cancels it immediately. Ordinary ChatGPT chats have no task lifecycle and never appear in Sleepwing.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>OpenCode</summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 在 <code>~/.config/opencode/plugins/perch.ts</code> 写入一个带所有权标记的本地插件，监听 <code>session.status</code>、<code>session.idle</code>、<code>permission.asked</code> 等官方事件。连接后请重启 OpenCode。</span><span data-l="en">Sleepwing writes an ownership-marked local plugin to <code>~/.config/opencode/plugins/perch.ts</code>, listening to official events like <code>session.status</code>, <code>session.idle</code>, and <code>permission.asked</code>. Restart OpenCode after connecting.</span></p>
+        <p><span data-l="zh">Sleepwing 不会覆盖不属于它的同名文件，移除时也只删除带 Sleepwing 所有权标记的文件。「本地连接通过」代表链路可用；「已收到真实状态」只有在真实事件到达后才会显示。</span><span data-l="en">Sleepwing never overwrites an unrelated file of the same name, and removal deletes only the ownership-marked file. "Local connection passed" confirms the relay; "Real state received" appears only after a genuine event arrives.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>Gemini CLI</summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 将钩子合并进 <code>~/.gemini/settings.json</code>（<code>SessionStart</code>、<code>BeforeAgent</code>、<code>BeforeTool</code>、<code>AfterTool</code>、<code>Notification</code>、<code>AfterAgent</code>、<code>SessionEnd</code>），保留你已有的设置。</span><span data-l="en">Sleepwing merges hooks into <code>~/.gemini/settings.json</code> (<code>SessionStart</code>, <code>BeforeAgent</code>, <code>BeforeTool</code>, <code>AfterTool</code>, <code>Notification</code>, <code>AfterAgent</code>, <code>SessionEnd</code>), preserving existing settings.</span></p>
+        <p><span data-l="zh">Gemini 的钩子载荷可能包含提示词与工具输入，Sleepwing 的本地中继在传输前会全部丢弃，只保留平台、会话标识、阶段和时间戳。</span><span data-l="en">Gemini hook payloads can contain prompts and tool inputs; Sleepwing's local relay discards all of it before transport, keeping only provider, session identifier, phase, and timestamp.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>TRAE IDE</summary>
+      <div class="body">
+        <p><span data-l="zh">同时支持国际版 <code>~/.trae/hooks.json</code> 和国内版 <code>~/.trae-cn/hooks.json</code>：如果 <code>~/.trae-cn</code> 已存在则优先使用国内路径。移除时只清理 Sleepwing 自己的命令条目。</span><span data-l="en">Both official global locations are supported — <code>~/.trae/hooks.json</code> and <code>~/.trae-cn/hooks.json</code>; the China path is chosen when <code>~/.trae-cn</code> already exists. Removal touches only Sleepwing-owned command entries.</span></p>
+      </div>
+    </details>
+
+    <details>
+      <summary>pi coding agent</summary>
+      <div class="body">
+        <p><span data-l="zh">通过 pi 的官方本地扩展生命周期接入，同样只传输脱敏后的生命周期事件，安装与移除均可逆。</span><span data-l="en">Connected through pi's official local extension lifecycle. Only sanitized lifecycle events are relayed, and install/removal are reversible.</span></p>
+      </div>
+    </details>
+
+    <h3 style="margin-top:44px">
+      <span data-l="zh">导入自定义桌宠</span><span data-l="en">Import a custom pet</span>
+    </h3>
+    <details>
+      <summary><span data-l="zh">用 Pet Studio 制作并导入 .perchpet</span><span data-l="en">Create and import a .perchpet with Pet Studio</span></summary>
+      <div class="body">
+        <ol>
+          <li><span data-l="zh">打开 Sleepwing → Pet Studio，一键安装 App 自带的 <code>perch-pet</code> Agent 技能；只有用户环境中已安装 <code>hatch-pet</code> 时才会复用它。</span><span data-l="en">Open Sleepwing → Pet Studio and install the app-bundled <code>perch-pet</code> agent skill; it reuses <code>hatch-pet</code> only when that optional skill is already installed.</span></li>
+          <li><span data-l="zh">在你的编程 Agent 里描述角色创意或提供角色图，技能会产出完整的 <code>.perchpet</code> 素材包。</span><span data-l="en">Describe your character idea or provide character art to your coding agent; the skill produces a complete <code>.perchpet</code> package.</span></li>
+          <li><span data-l="zh">回到 Pet Studio 导入。Sleepwing 会校验大小、路径、清单与素材，拒绝符号链接，然后用真实的待机动画实时预览。</span><span data-l="en">Import it back in Pet Studio. Sleepwing validates size, paths, manifest, and assets, rejects symbolic links, and previews the real idle motion live.</span></li>
+        </ol>
+        <p><span data-l="zh">导入的素材包始终保留在本机。</span><span data-l="en">Imported packages always stay on your Mac.</span></p>
+      </div>
+    </details>
+
+    <h3 style="margin-top:44px">
+      <span data-l="zh">卸载</span><span data-l="en">Uninstall</span>
+    </h3>
+    <details>
+      <summary><span data-l="zh">完整移除 Sleepwing</span><span data-l="en">Remove Sleepwing completely</span></summary>
+      <div class="body">
+        <p><span data-l="zh">Sleepwing 不安装特权助手或内核扩展。</span><span data-l="en">Sleepwing installs no privileged helper and no kernel extension.</span></p>
+        <ol>
+          <li><span data-l="zh">打开 Sleepwing →「连接」，移除每一个已安装的 Agent 集成，让 Sleepwing 恢复它拥有的钩子或插件条目。</span><span data-l="en">Open Sleepwing → Integrations and remove every installed agent integration so Sleepwing restores only the hook or plugin entries it owns.</span></li>
+          <li><span data-l="zh">在 Sleepwing 中关闭「登录时启动」，然后退出应用。</span><span data-l="en">Turn off Launch at Login in Sleepwing, then quit the app.</span></li>
+          <li><span data-l="zh">把 Sleepwing.app 移到废纸篓。</span><span data-l="en">Move Sleepwing.app to the Trash.</span></li>
+          <li><span data-l="zh">如需清除本地数据，删除 <code>~/Library/Application Support/Perch</code>；如需清除偏好设置，运行 <code>defaults delete app.sleepwing.Sleepwing</code>。</span><span data-l="en">To erase local data, remove <code>~/Library/Application Support/Perch</code>; to erase preferences, run <code>defaults delete app.sleepwing.Sleepwing</code>.</span></li>
+        </ol>
+        <p><span data-l="zh">集成安装期间生成的相邻备份文件可能会保留，删除前请先检查——它们在需要手动恢复配置时很有用。详见<a href="https://github.com/lttxzmj/sleepwing/blob/main/docs/UNINSTALL.md">卸载指南</a>。</span><span data-l="en">Adjacent configuration backups created during integration install may remain; inspect them before deleting — they help if a provider configuration ever needs manual restoration. See the <a href="https://github.com/lttxzmj/sleepwing/blob/main/docs/UNINSTALL.md">removal guide</a>.</span></p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- Privacy -->
+<section id="privacy" class="alt-bg">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">隐私</span><span data-l="en">Privacy</span></span>
+    <h2>
+      <span data-l="zh">脱敏先于传输，本地就是全部</span>
+      <span data-l="en">Sanitize before transport. Local is everything.</span>
+    </h2>
+    <p class="sub">
+      <span data-l="zh">Sleepwing 唯一的网络行为是监听本机回环地址（127.0.0.1），自身不发起任何对外网络请求——无账户、无广告、无跨应用跟踪、无产品分析、无遥测，也没有自动更新检查。可选的桌宠对话默认完全本地；只有你明确选择「我的 Agent」时，输入内容才交给你自己的 Agent 处理。诊断报告经白名单约束、一键生成并在访达中打开——它不可能包含提示词、代码、回复、工具输入、路径或标识符。</span>
+      <span data-l="en">Sleepwing's only network surface is a loopback listener (127.0.0.1) — the app makes no outbound network requests. No account, no ads, no cross-app tracking, no analytics, no telemetry, no automatic update checks. The optional pet chat is fully local by default; only if you explicitly choose "My agent" is your typed input handed to your own agent. The one-click diagnostic report is allowlist-constrained and opens in Finder — it cannot contain prompts, code, responses, tool inputs, paths, or identifiers.</span>
+    </p>
+    <div class="priv" style="margin-top:30px">
+      <div class="card accent-green">
+        <h3 class="ok-title"><svg class="ico" aria-hidden="true"><use href="#i-check"/></svg><span data-l="zh">会进入 Sleepwing 的</span><span data-l="en">What enters Sleepwing</span></h3>
+        <ul>
+          <li><span data-l="zh">平台名称（如 claude、cursor）</span><span data-l="en">Provider name (e.g. claude, cursor)</span></li>
+          <li><span data-l="zh">不透明的会话标识</span><span data-l="en">An opaque session identifier</span></li>
+          <li><span data-l="zh">生命周期阶段与时间戳</span><span data-l="en">Lifecycle phase and timestamp</span></li>
+          <li><span data-l="zh">可选任务名（≤ 60 字符，随会话过期）</span><span data-l="en">Optional task label (≤ 60 chars, expires with the session)</span></li>
+          <li><span data-l="zh">经白名单校验的本地返回路径</span><span data-l="en">An allowlisted local resume route</span></li>
+        </ul>
+      </div>
+      <div class="card" style="--accent:var(--red)">
+        <h3 class="no-title"><svg class="ico" aria-hidden="true"><use href="#i-x"/></svg><span data-l="zh">永远不会进入的</span><span data-l="en">What never enters</span></h3>
+        <ul>
+          <li><span data-l="zh">提示词与助手回复</span><span data-l="en">Prompts and assistant responses</span></li>
+          <li><span data-l="zh">源代码与文件完整路径</span><span data-l="en">Source code and full file-system paths</span></li>
+          <li><span data-l="zh">工具输入与输出</span><span data-l="en">Tool inputs and outputs</span></li>
+          <li><span data-l="zh">错误正文</span><span data-l="en">Error bodies</span></li>
+          <li><span data-l="zh">附件名、UUID 类标识符与提示词包装</span><span data-l="en">Attachment names, UUID-like identifiers, and prompt wrappers</span></li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:22px;font-size:.925rem">
+      <span data-l="zh">完整政策：<a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.zh-Hans.md">隐私政策</a> · <a href="https://github.com/lttxzmj/sleepwing/blob/main/SECURITY.md">安全政策</a></span>
+      <span data-l="en">The complete policies: <a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.md">Privacy Policy</a> · <a href="https://github.com/lttxzmj/sleepwing/blob/main/SECURITY.md">Security Policy</a></span>
+    </p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="wrap faq">
+    <span class="kicker">FAQ</span>
+    <h2><span data-l="zh">常见问题</span><span data-l="en">Frequently asked questions</span></h2>
+    <div style="margin-top:26px">
+      <details>
+        <summary><span data-l="zh">我的代码或提示词会被上传吗？</span><span data-l="en">Is my code or prompt ever uploaded?</span></summary>
+        <div class="body"><p><span data-l="zh">不会。Sleepwing 没有服务器端，不要求账户。钩子事件在进入 Sleepwing 之前先在本地脱敏，提示词、代码、工具输入输出和完整路径在传输前就被丢弃，桌宠与统计只依赖生命周期元数据。</span><span data-l="en">No. Sleepwing has no server side and requires no account. Hook events are sanitized locally before they reach Sleepwing — prompts, code, tool I/O, and full paths are discarded before transport. The companion and statistics rely only on lifecycle metadata.</span></p></div>
+      </details>
+      <details>
+        <summary><span data-l="zh">支持 Intel Mac 吗？</span><span data-l="en">Does it support Intel Macs?</span></summary>
+        <div class="body"><p><span data-l="zh">当前公开测试版仅支持 macOS 14 及以上的 Apple Silicon Mac。在通用构建通过同样的验收测试之前，我们不声称兼容 Intel。</span><span data-l="en">The current public beta targets macOS 14 or later on Apple Silicon only. Intel compatibility is not claimed until a universal build passes the same acceptance matrix.</span></p></div>
+      </details>
+      <details>
+        <summary><span data-l="zh">会拖慢我的 Agent 吗？</span><span data-l="en">Will it slow down my agents?</span></summary>
+        <div class="body"><p><span data-l="zh">钩子投递是尽力而为的：即使 Sleepwing 没有运行，钩子也会立刻静默返回，绝不阻塞或影响宿主 Agent。</span><span data-l="en">Hook delivery is best-effort: even when Sleepwing is not running, hooks return silently and immediately. They never block or fail the host agent.</span></p></div>
+      </details>
+      <details>
+        <summary><span data-l="zh">能同时显示多只桌宠吗？</span><span data-l="en">Can I show multiple pets at once?</span></summary>
+        <div class="body"><p><span data-l="zh">不能，这是有意的设计。无论连接多少个 Agent，桌面上始终只有一只伙伴代表全部状态——精确的分任务状态在菜单栏的任务收件箱里。</span><span data-l="en">No — by design. However many agents you connect, one companion represents the aggregate state. Exact per-task states live in the menu bar task inbox.</span></p></div>
+      </details>
+      <details>
+        <summary><span data-l="zh">健康提醒会不会很吵？</span><span data-l="en">Will the health reminders nag me?</span></summary>
+        <div class="body"><p><span data-l="zh">不会。提醒只在经验证的 Agent 工作时间达到阈值后出现，有每小时上限、勿扰时段和 10 分钟稍后提醒；Agent 等待你时提醒会让位。没有排名、没有连续打卡、不奖励屏幕时间。</span><span data-l="en">No. Reminders appear only after verified agent work time crosses a threshold, with an hourly cap, quiet hours, and 10-minute snoozes; attention states take priority. No rankings, no streaks, no rewarding screen time.</span></p></div>
+      </details>
+      <details>
+        <summary><span data-l="zh">如何反馈问题或报告安全漏洞？</span><span data-l="en">How do I give feedback or report a vulnerability?</span></summary>
+        <div class="body"><p><span data-l="zh">一般问题与建议请提交 <a href="https://github.com/lttxzmj/sleepwing/issues">GitHub Issues</a>。安全漏洞请使用仓库的<a href="https://github.com/lttxzmj/sleepwing/security/advisories/new">私密安全通告</a>渠道，不要在公开 Issue 中包含令牌、私有提示词或个人数据。</span><span data-l="en">For general feedback, open a <a href="https://github.com/lttxzmj/sleepwing/issues">GitHub Issue</a>. For vulnerabilities, use the repository's <a href="https://github.com/lttxzmj/sleepwing/security/advisories/new">private security advisory</a> — never include tokens, private prompts, or personal data in a public issue.</span></p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- Download -->
+<section id="download" class="alt-bg">
+  <div class="wrap">
+    <span class="kicker"><span data-l="zh">下载</span><span data-l="en">Download</span></span>
+    <h2><span data-l="zh">获取 Sleepwing 公开测试版</span><span data-l="en">Get the Sleepwing public beta</span></h2>
+    <div class="panel" style="margin-top:26px">
+      <div class="cta-row" style="justify-content:flex-start;margin-bottom:0">
+        <a class="btn btn-primary" id="downloadBtn" href="#" aria-disabled="true">
+          <svg class="ico" aria-hidden="true"><use href="#i-download"/></svg>
+          <span data-l="zh">下载 Sleepwing <span class="v"></span>（即将发布）</span>
+          <span data-l="en">Download Sleepwing <span class="v"></span> (coming soon)</span>
+        </a>
+        <a class="btn btn-secondary" href="https://github.com/lttxzmj/sleepwing/releases">
+          <span data-l="zh">全部版本</span><span data-l="en">All releases</span>
+        </a>
+      </div>
+      <div class="dl-meta">
+        <span><strong data-l="zh">系统要求</strong><strong data-l="en">Requires</strong>&nbsp;<span data-l="zh">macOS 14 或更高版本</span><span data-l="en">macOS 14 or later</span></span>
+        <span><strong data-l="zh">芯片</strong><strong data-l="en">Chip</strong>&nbsp;<span data-l="zh">仅限 Apple Silicon</span><span data-l="en">Apple Silicon only</span></span>
+        <span><strong data-l="zh">状态</strong><strong data-l="en">Status</strong>&nbsp;<span data-l="zh">公开测试版（Beta）</span><span data-l="en">Public Beta</span></span>
+        <span><strong data-l="zh">签名</strong><strong data-l="en">Signing</strong>&nbsp;<span data-l="zh">Developer ID + Apple 公证</span><span data-l="en">Developer ID + Apple notarization</span></span>
+      </div>
+      <div class="sha" id="shaBox">
+        <strong>SHA-256:</strong> <span id="shaValue"><span data-l="zh">发布时由 release-manifest.json 填入</span><span data-l="en">Filled from release-manifest.json at release time</span></span>
+      </div>
+      <p style="margin:14px 0 0;font-size:.85rem;color:var(--text-2)">
+        <span data-l="zh">官方安装包仅通过上方的 GitHub Releases 发布；其他站点提供的下载均非官方渠道。</span>
+        <span data-l="en">Official builds are published only via GitHub Releases above; downloads from any other site are not official.</span>
+      </p>
+      <h3 style="margin-top:26px;font-size:1rem">
+        <span data-l="zh">Beta 已知限制</span><span data-l="en">Known beta limitations</span>
+      </h3>
+      <ul class="limit-list">
+        <li><span data-l="zh">仅观察本地 Agent 会话的生命周期事件；云端 Agent 与远程会话不在支持范围。</span><span data-l="en">Only local agent sessions' lifecycle events are observed; cloud agents and remote sessions are out of scope.</span></li>
+        <li><span data-l="zh">如果某平台不提供某种生命周期状态（例如部分平台缺少细分的等待状态），Sleepwing 会如实说明，而不是模拟。</span><span data-l="en">Where a provider lacks a lifecycle state (for example, fine-grained attention on some surfaces), Sleepwing says so rather than simulating it.</span></li>
+        <li><span data-l="zh">普通 ChatGPT 聊天没有 Codex 任务生命周期，不会出现在 Sleepwing 中。</span><span data-l="en">Ordinary ChatGPT conversations have no Codex task lifecycle and never appear in Sleepwing.</span></li>
+        <li><span data-l="zh">仅支持 Apple Silicon；Intel 兼容尚未声明。</span><span data-l="en">Apple Silicon only; Intel compatibility is not yet claimed.</span></li>
+      </ul>
+      <div class="doc-links">
+        <a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.zh-Hans.md" data-l="zh">隐私政策</a>
+        <a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.md" data-l="en">Privacy Policy</a>
+        <a href="https://github.com/lttxzmj/sleepwing/blob/main/SECURITY.md"><span data-l="zh">安全政策</span><span data-l="en">Security Policy</span></a>
+        <a href="https://github.com/lttxzmj/sleepwing/blob/main/CHANGELOG.md"><span data-l="zh">更新日志</span><span data-l="en">Changelog</span></a>
+        <a href="#tutorial"><span data-l="zh">接入教程</span><span data-l="en">Setup tutorials</span></a>
+        <a href="https://github.com/lttxzmj/sleepwing/blob/main/docs/UNINSTALL.md"><span data-l="zh">卸载指南</span><span data-l="en">Removal guide</span></a>
+        <a href="https://github.com/lttxzmj/sleepwing/issues"><span data-l="zh">反馈渠道</span><span data-l="en">Feedback</span></a>
+        <a href="https://github.com/lttxzmj/sleepwing/security/advisories/new"><span data-l="zh">报告安全漏洞</span><span data-l="en">Report a vulnerability</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div>
+      <div class="brand" style="margin-bottom:8px">
+        <img src="assets/perch-icon-appicon.png" alt="" width="24" height="24" style="width:24px;height:24px;border-radius:6px">
+        Sleepwing
+      </div>
+      <p style="margin:0">
+        <span data-l="zh">安静、温暖、克制的桌面健康伙伴。</span>
+        <span data-l="en">A quiet, warm, restrained desktop health companion.</span>
+      </p>
+      <p style="margin:6px 0 0">© 2026 Sleepwing</p>
+      <p style="margin:10px 0 0;font-size:.8125rem;max-width:420px">
+        <span data-l="zh">唯一官方网站：<a href="https://lttxzmj.github.io/sleepwing/">lttxzmj.github.io/sleepwing</a>；官方安装包仅通过 <a href="https://github.com/lttxzmj/sleepwing/releases">GitHub Releases</a> 发布。请谨防同名网站与来源不明的安装包。</span>
+        <span data-l="en">The only official website is <a href="https://lttxzmj.github.io/sleepwing/">lttxzmj.github.io/sleepwing</a>, and official downloads are published only on <a href="https://github.com/lttxzmj/sleepwing/releases">GitHub Releases</a>. Beware of similarly named sites and unofficial installers.</span>
+      </p>
+    </div>
+    <ul>
+      <li><a href="https://github.com/lttxzmj/sleepwing">GitHub</a></li>
+      <li><a href="gallery.html"><span data-l="zh">宠物画廊</span><span data-l="en">Pet Gallery</span></a></li>
+      <li><a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.zh-Hans.md" data-l="zh">隐私</a></li>
+      <li><a href="https://github.com/lttxzmj/sleepwing/blob/main/PRIVACY.md" data-l="en">Privacy</a></li>
+      <li><a href="https://github.com/lttxzmj/sleepwing/blob/main/SECURITY.md"><span data-l="zh">安全</span><span data-l="en">Security</span></a></li>
+      <li><a href="https://github.com/lttxzmj/sleepwing/blob/main/CHANGELOG.md"><span data-l="zh">更新日志</span><span data-l="en">Changelog</span></a></li>
+      <li><a href="https://github.com/lttxzmj/sleepwing/issues"><span data-l="zh">反馈</span><span data-l="en">Feedback</span></a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+/* Release metadata: fill downloadUrl and sha256 from release-manifest.json
+   when publishing a build. Empty values keep the button in "coming soon". */
+const PERCH_RELEASE = {
+  version: "0.5.4-beta.2",
+  downloadUrl: "https://github.com/lttxzmj/sleepwing/releases/download/v0.5.4-beta.2/Sleepwing-0.5.4-15-beta-macOS-arm64.zip",
+  sha256: "10a375ac6d76f739b577dcf3d8533ddabeb33fa5a80d8f6d2b4a6298de4948dd"
+};
+
+(function () {
+  // language: persisted choice > browser language > zh
+  const saved = localStorage.getItem("perch-lang");
+  const auto = (navigator.language || "zh").toLowerCase().startsWith("zh") ? "zh" : "en";
+  setLang(saved === "zh" || saved === "en" ? saved : auto);
+
+  document.getElementById("langToggle").addEventListener("click", function () {
+    const next = document.documentElement.dataset.lang === "zh" ? "en" : "zh";
+    localStorage.setItem("perch-lang", next);
+    setLang(next);
+  });
+
+  function setLang(lang) {
+    document.documentElement.dataset.lang = lang;
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
+    document.title = lang === "zh"
+      ? "Sleepwing — AI 干活，你歇会儿。"
+      : "Sleepwing — When AI does the work, take the break back.";
+  }
+
+  // release wiring
+  document.querySelectorAll("#downloadBtn .v").forEach(function (el) {
+    el.textContent = PERCH_RELEASE.version;
+  });
+  const btn = document.getElementById("downloadBtn");
+  if (PERCH_RELEASE.downloadUrl) {
+    btn.href = PERCH_RELEASE.downloadUrl;
+    btn.removeAttribute("aria-disabled");
+    btn.querySelectorAll("[data-l]").forEach(function (el) {
+      el.textContent = (el.dataset.l === "zh" ? "下载 Sleepwing " : "Download Sleepwing ") + PERCH_RELEASE.version;
+    });
+  } else {
+    btn.addEventListener("click", function (e) { e.preventDefault(); });
+  }
+  if (PERCH_RELEASE.sha256) {
+    document.getElementById("shaValue").textContent = PERCH_RELEASE.sha256;
+  }
+})();
+</script>
+</body>
+</html>
