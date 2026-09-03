@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleepwing dev notes</title>
+<meta name="description" content="Short weekly engineering notes from building Sleepwing: releases, fixes, and what actually changed under the hood.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/notes.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Sleepwing dev notes">
+<meta property="og:description" content="Short weekly engineering notes from building Sleepwing.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.7em;line-height:1.3}h2{margin-top:2em;font-size:1.25em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+article{border-bottom:1px solid var(--line);padding-bottom:1.5em;margin-bottom:1.5em}
+article:last-of-type{border-bottom:none}
+article time{color:var(--muted);font-size:.85em}
+.zh{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Sleepwing dev notes</h1>
+<p class="lead">Short weekly notes on what actually shipped — newest first. No roadmap promises, just what changed and why.</p>
+
+<!-- Newest note goes directly below this line. -->
+
+<article>
+<h2>First public release week</h2>
+<time datetime="2026-09-04">September 4, 2026</time>
+<p>The notarized 0.6.0 build 17 went out on GitHub Releases this week — Sleepwing's first public beta, signed with a Developer ID and stapled, macOS 14+ on Apple Silicon. The release script fails closed: if notarization doesn't come back clean, nothing ships.</p>
+<p>The most satisfying fix was small: the completion celebration used to sprint through its frames in 1.8 seconds and read as fast-forward next to its caption. The frames now hold roughly twice as long, so the same arc lasts about three seconds, and the celebration window, the caption, and the onboarding demo pacing all derive from one constant so they can't drift apart again. A related fix keys the celebration to the on-model landing frames instead of firing mid-air.</p>
+<p>The site also grew four SEO pages — an honest comparison, an agent-notifications guide, a TRAE user guide, and the community pet gallery — wired into a sitemap and an IndexNow submission pipeline so search engines hear about changes the same day. One embarrassing bug closed out the week: the social share card rendered CJK text in a fallback font. Fixed.</p>
+<p class="zh"><b>中文速览：</b>本周 Sleepwing 发布了首个公开测试版——经过公证的 0.6.0（build 17），仅在 GitHub Releases 分发。最顺手的一个修复是庆祝动画：原来 1.8 秒跑完像快进，现在每帧停留时间加倍、整段约 3 秒，且动画窗口、文案和演示节奏都由同一个常量派生，不会再各走各的。官网新增对比、通知指南、TRAE 指南、宠物画廊四个页面，并接入了 IndexNow；分享卡片的中文字体回退问题也修掉了。</p>
+</article>
+
+<footer>
+The only official site is lttxzmj.github.io/sleepwing; official downloads are on GitHub Releases only.
+Corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+</footer>
+</main>
+</body>
+</html>
