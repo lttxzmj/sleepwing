@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRAE 任务完成/等待输入时如何收到通知？桌宠方案（支持国际版与国内版）</title>
+<meta name="description" content="TRAE 在跑长任务时不用一直盯着：Sleepwing 桌宠通过 TRAE 官方 hooks 监看任务生命周期（国际版 ~/.trae 与国内版 ~/.trae-cn 均支持），完成、失败、等你输入时第一时间提醒你，零外联、免费。">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/trae.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="TRAE 任务完成时如何收到通知？桌宠方案（国际版/国内版）">
+<meta property="og:description" content="一只桌宠替你盯着 TRAE：完成、失败、等你输入时叫你，零外联、免费。">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif}
+main{max-width:720px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.55em;line-height:1.4}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.93em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+.pets{display:flex;gap:10px;margin:18px 0}.pets img{width:110px;border-radius:12px;background:#1e2422}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+ul li{margin:6px 0}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>TRAE 在干活，你却还坐在屏幕前等？</h1>
+<p class="lead">TRAE 的 Agent 跑一个长任务动辄几分钟。多数人的做法是切出去又忍不住切回来看——既没休息，也没干别的。这一页给你一个更好的方案。</p>
+
+<div class="pets">
+  <img src="assets/sleepwing-idle.gif" alt="TRAE 工作时安静陪伴的眠翼鸟桌宠">
+  <img src="assets/sleepwing-waiting.gif" alt="TRAE 需要你时探头提醒的桌宠">
+  <img src="assets/sleepwing-celebrate.gif" alt="TRAE 任务完成时庆祝的桌宠">
+</div>
+
+<h2>Sleepwing：一只替你盯着 TRAE 的桌宠</h2>
+<p><a href="index.html">Sleepwing</a> 是免费的 macOS 桌面应用，通过 TRAE 的<b>官方 hooks 机制</b>接入任务生命周期——<b>国际版（<code>~/.trae</code>）和国内版（<code>~/.trae-cn</code>）都原生支持</b>，两种配置路径自动识别：</p>
+<ul>
+<li><b>任务开始</b>：桌宠进入陪工状态，你可以放心离开屏幕；</li>
+<li><b>等待你输入 / 权限确认</b>：桌宠立刻探头提醒，点击直接回到 TRAE；</li>
+<li><b>完成或失败</b>：清楚区分，完成有庆祝，失败不装死；</li>
+<li><b>顺便管住你的健康</b>：TRAE 干活的时间会变成喝水、拉伸这类 30 秒小提醒——按真实工作时间计，不是死板的定时闹钟，TRAE 等你时提醒自动暂停。</li>
+</ul>
+
+<div class="note">
+<b>隐私说明（重要）</b>：Sleepwing <b>零对外网络</b>——不发任何请求、无账户、无遥测。Hook 事件在本地脱敏后才进入应用：只有「TRAE、会话编号、状态、时间」，<b>你的提示词、代码、文件路径永远不会被读取</b>。源码公开可查证。安装与卸载都是可逆的，只改动 Sleepwing 自己的配置条目。
+</div>
+
+<h2>安装（一分钟）</h2>
+<ol>
+<li><a href="https://github.com/lttxzmj/sleepwing/releases/latest">下载已公证的 Beta 安装包</a>（macOS 14+，Apple Silicon，解压双击即用，无警告弹窗）；</li>
+<li>打开 Sleepwing 的「连接」页，点 TRAE 一键安装 hooks；</li>
+<li>回 TRAE 跑一个任务，看桌宠动起来。</li>
+</ol>
+<p>不止 TRAE：同一只桌宠还能统一看管 Claude Code、Cursor、Codex/ChatGPT、OpenCode、Gemini CLI 和 pi——多 Agent 并行时健康时间只算一份，谁在等你一目了然。</p>
+
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ 免费下载 Sleepwing Beta</a></p>
+
+<footer>
+反馈与问题：<a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a> ·
+另见 <a href="compare.html">与同类工具的诚实对比</a> · <a href="guide-agent-notifications.html">Agent 通知方案指南（英文）</a><br>
+唯一官方网站 lttxzmj.github.io/sleepwing；官方安装包仅通过 GitHub Releases 发布。
+</footer>
+</main>
+</body>
+</html>
