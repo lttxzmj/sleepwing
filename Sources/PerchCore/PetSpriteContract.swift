@@ -228,7 +228,11 @@ public enum PetSpriteContract {
             PetAnimationRow(
                 state: state,
                 row: 4,
-                frameDurations: milliseconds(320, 400, 180, 220, 520, 220, 360, 900),
+                // The mid-air peak is the row's weakest drawing (the pose
+                // goes off-model and loses volume), so the celebration's
+                // weight sits on the on-model landing frames instead: the
+                // peak flashes, the landing lingers. Total arc unchanged.
+                frameDurations: milliseconds(320, 400, 180, 220, 300, 340, 460, 900),
                 playback: .onceHoldLast
             )
         case .failed:

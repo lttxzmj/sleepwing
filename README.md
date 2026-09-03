@@ -4,9 +4,39 @@
 
 [中文](README.zh-Hans.md) | English
 
+<p align="center">
+  <img src="Site/assets/sleepwing-idle.gif" width="96" alt="Sleepwing keeping watch while agents work">
+  <img src="Site/assets/sleepwing-waiting.gif" width="96" alt="Sleepwing calling you back">
+  <img src="Site/assets/sleepwing-celebrate.gif" width="96" alt="Sleepwing celebrating a completed task">
+</p>
+
+<p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the beta</b></a> · notarized, macOS 14+, Apple Silicon · zero outbound network
+</p>
+
 Sleepwing is a privacy-first macOS desktop companion that watches local AI coding agents while the user takes a real break. It turns verified Agent work time into bounded health opportunities, then recalls the user when an Agent needs input. One companion represents every connected Agent; the menu bar handles exact status, integrations, and local statistics.
 
 > When AI takes over the work, Sleepwing gives the time back to your body—and calls you back when it is your turn.
+
+<p align="center">
+  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="Sleepwing resting while agents work">
+  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="Sleepwing calling you back">
+  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="Sleepwing celebrating a finished task">
+</p>
+
+<p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the notarized beta</b></a> · free · macOS 14+ · Apple Silicon · zero outbound network
+</p>
+
+<p align="center">
+  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="Sleepwing resting while agents work">
+  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="Sleepwing calling you back">
+  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="Sleepwing celebrating a finished task">
+</p>
+
+<p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the notarized beta</b></a> · free · macOS 14+ · Apple Silicon · zero outbound network
+</p>
 
 Official downloads are published only on [GitHub Releases](https://github.com/lttxzmj/sleepwing/releases); the only official website is [lttxzmj.github.io/sleepwing](https://lttxzmj.github.io/sleepwing/).
 

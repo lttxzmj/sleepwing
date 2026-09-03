@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleepwing vs Codex Pets, clawd-on-desk, Stretchly &amp; Lookaway — an honest comparison</title>
+<meta name="description" content="How Sleepwing compares to Codex Pets, clawd-on-desk, Stretchly, Lookaway and RunCat: agent-aware health breaks, recall to the exact session, voice dispatch, and zero outbound network.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/compare.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Sleepwing vs the alternatives — an honest comparison">
+<meta property="og:description" content="Desktop pets that watch coding agents, break reminders, and where Sleepwing actually differs.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/perch-icon-appicon.png">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.7em;line-height:1.3}h2{margin-top:2em;font-size:1.25em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+table{border-collapse:collapse;width:100%;margin:1.2em 0;font-size:.92em}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--card)}td b{color:var(--accent)}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+.pets{display:flex;gap:10px;margin:18px 0}.pets img{width:110px;image-rendering:auto;border-radius:12px;background:#1e2422}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Sleepwing vs the alternatives — an honest comparison</h1>
+<p class="lead">There are now many ways to keep an eye on your AI coding agents: official pets, open-source overlays, and classic break reminders. Most of them are good at what they do. Here is where Sleepwing actually differs — and when you should pick something else.</p>
+
+<div class="pets">
+  <img src="assets/sleepwing-idle.gif" alt="Sleepwing resting while agents work">
+  <img src="assets/sleepwing-waiting.gif" alt="Sleepwing calling you back">
+  <img src="assets/sleepwing-celebrate.gif" alt="Sleepwing celebrating a finished task">
+</div>
+
+<h2>The one-sentence difference</h2>
+<p>Every alternative answers <em>“what is my agent doing?”</em>. Sleepwing answers <em>“what should <b>I</b> do right now?”</em> — it converts verified agent work time into small, bounded health breaks (water, stretch, look away), and calls you back the moment it is actually your turn.</p>
+
+<h2>Feature comparison</h2>
+<table>
+<tr><th></th><th>Sleepwing</th><th><a href="https://developers.openai.com/codex/pets" rel="nofollow">Codex Pets</a> (official)</th><th><a href="https://github.com/rullerzhou-afk/clawd-on-desk" rel="nofollow">clawd-on-desk</a></th><th><a href="https://hovancik.net/stretchly/" rel="nofollow">Stretchly</a></th><th><a href="https://lookaway.app" rel="nofollow">Lookaway</a></th></tr>
+<tr><td>Watches <b>all</b> your local agents in one place</td><td><b>7 surfaces</b>: Claude Code, Cursor, Codex/ChatGPT, OpenCode, Gemini CLI, TRAE, pi</td><td>Codex only</td><td>Multiple agents</td><td>—</td><td>—</td></tr>
+<tr><td>Health breaks tied to <b>real agent work time</b></td><td><b>Yes — the core feature</b>; paused when an agent needs you, capped hourly</td><td>No</td><td>No</td><td>Fixed clock</td><td>Fixed clock / screen time</td></tr>
+<tr><td>Recall that lands in the exact session</td><td><b>Yes</b> (allowlisted resume routes)</td><td>Activity tray</td><td>Notifications</td><td>—</td><td>—</td></tr>
+<tr><td>Voice dispatch (“tell codex to run the tests”)</td><td><b>Yes</b>, hold-to-talk, on-device recognition</td><td>No</td><td>No</td><td>—</td><td>—</td></tr>
+<tr><td>Photo → custom pet</td><td><b>Yes</b>, validated .perchpet packages</td><td>Custom sprites</td><td>Custom themes</td><td>—</td><td>—</td></tr>
+<tr><td>Outbound network traffic</td><td><b>Zero.</b> No telemetry, no update checks; verifiable in source</td><td>Part of ChatGPT app</td><td>Local</td><td>Local + updates</td><td>Closed source</td></tr>
+<tr><td>Source</td><td>Source-available (FSL → MIT)</td><td>Closed</td><td>AGPL code</td><td>Open source</td><td>Closed</td></tr>
+<tr><td>Price</td><td><b>Free beta</b> (health core stays free)</td><td>With subscription</td><td>Free</td><td>Free</td><td>$19–29</td></tr>
+</table>
+
+<h2>When you should pick something else</h2>
+<p class="note">
+Only use Codex and want a mascot? <b>Codex Pets</b> is built in — use it. Want a cross-platform pixel overlay with themes and no health opinion? <b>clawd-on-desk</b> is excellent. Just want eye-break reminders with no AI involved? <b>Stretchly</b> (free) or <b>Lookaway</b> (polished, paid) are the right tools. Sleepwing is for people who run <em>multiple</em> agents daily and keep sitting at the desk doing nothing while the machines work.
+</p>
+
+<h2>中文速览</h2>
+<p>所有同类工具回答的是「我的 Agent 在干嘛」，Sleepwing 回答的是「<b>我现在该干嘛</b>」：七家 Agent 一只桌宠统一看管，把真实的 Agent 工作时间换成喝水、拉伸这类 30 秒小休息，轮到你时一键跳回原会话，还支持按住说话直接派活（含 TRAE 国内版）。零对外网络，源码可查。</p>
+
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the free notarized beta</a></p>
+
+<footer>
+Facts checked 2026-09 against each product’s public pages; corrections welcome via
+<a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+The only official site is lttxzmj.github.io/sleepwing; official downloads are on GitHub Releases only.
+</footer>
+</main>
+</body>
+</html>

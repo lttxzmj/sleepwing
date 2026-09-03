@@ -8,6 +8,16 @@ Sleepwing 是一款隐私优先的 macOS 桌面陪伴应用，在本地 AI 编�
 
 > AI 干活，你歇会儿——需要你的时候，它会把你叫回来。
 
+<p align="center">
+  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="睡眠中的眠翼鸟">
+  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="探头叫你回来的眠翼鸟">
+  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="庆祝任务完成的眠翼鸟">
+</p>
+
+<p align="center">
+  <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ 下载已公证的 Beta</b></a> · 免费 · macOS 14+ · Apple Silicon · 零对外网络
+</p>
+
 官方安装包仅通过 [GitHub Releases](https://github.com/lttxzmj/sleepwing/releases) 发布；唯一官方网站是 [lttxzmj.github.io/sleepwing](https://lttxzmj.github.io/sleepwing/)。
 
 ## 当前状态
