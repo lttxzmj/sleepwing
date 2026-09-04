@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<title>Sleepwing dev notes</title>
+<link>https://lttxzmj.github.io/sleepwing/notes.html</link>
+<atom:link href="https://lttxzmj.github.io/sleepwing/feed.xml" rel="self" type="application/rss+xml"/>
+<description>Build-in-public notes from Sleepwing — the privacy-first macOS desktop pet that watches your AI coding agents.</description>
+<language>en</language>
+<item>
+<title>Sleepwing 0.6.0 beta ships notarized; celebration timing fixed; five guide pages live</title>
+<link>https://lttxzmj.github.io/sleepwing/notes.html</link>
+<guid isPermaLink="false">sleepwing-note-2026-09-04</guid>
+<pubDate>Thu, 04 Sep 2026 08:00:00 GMT</pubDate>
+<description>The first notarized public beta (0.6.0 build 17) is on GitHub Releases; the celebration animation now rests its weight on on-model frames; and the site grew honest comparison and notification guides for Claude Code, Codex, Cursor and TRAE.</description>
+</item>
+</channel>
+</rss>
