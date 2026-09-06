@@ -25,6 +25,12 @@ Sleepwing 是一款隐私优先的 macOS 桌面陪伴应用，在本地 AI 编�
 <p align="center">
   <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ 下载已公证的 Beta</b></a> · 免费 · macOS 14+ · Apple Silicon · 零对外网络
 </p>
+或使用 Homebrew 安装：
+
+```sh
+brew install --cask lttxzmj/tap/sleepwing
+```
+
 
 官方安装包仅通过 [GitHub Releases](https://github.com/lttxzmj/sleepwing/releases) 发布；唯一官方网站是 [lttxzmj.github.io/sleepwing](https://lttxzmj.github.io/sleepwing/)。
 

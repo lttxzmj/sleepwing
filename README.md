@@ -21,6 +21,12 @@
 <p align="center">
   <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the beta</b></a> · notarized, macOS 14+, Apple Silicon · zero outbound network
 </p>
+Or with Homebrew:
+
+```sh
+brew install --cask lttxzmj/tap/sleepwing
+```
+
 
 Sleepwing is a privacy-first macOS desktop companion that watches local AI coding agents while the user takes a real break. It turns verified Agent work time into bounded health opportunities, then recalls the user when an Agent needs input. One companion represents every connected Agent; the menu bar handles exact status, integrations, and local statistics.
 
