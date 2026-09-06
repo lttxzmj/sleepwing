@@ -50,7 +50,8 @@ public enum HookPayloadSanitizer {
     public static func sanitize(
         provider: AgentProvider,
         rawData: Data,
-        receivedAt: Date = .now
+        receivedAt: Date = .now,
+        controllingTTY: String? = nil
     ) throws -> Data {
         guard rawData.count <= maximumRawPayloadBytes else {
             throw CanonicalAgentEventError.invalidPayload
@@ -64,7 +65,11 @@ public enum HookPayloadSanitizer {
             timestamp: receivedAt,
             taskLabel: taskIdentity?.label,
             taskLabelKind: taskIdentity?.kind,
-            resumeURL: resumeURL(provider: provider, rawSessionID: event.sessionID)
+            resumeURL: resumeURL(
+                provider: provider,
+                rawSessionID: event.sessionID,
+                controllingTTY: controllingTTY
+            )
         )
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
@@ -158,24 +163,43 @@ public enum HookPayloadSanitizer {
 
     private static func resumeURL(
         provider: AgentProvider,
-        rawSessionID: String
+        rawSessionID: String,
+        controllingTTY: String?
     ) -> String? {
-        guard provider == .codex,
-              rawSessionID != IntegrationVerificationProbe.rawSessionID,
-              isValidResumeRouteComponent(rawSessionID) else {
+        if provider == .codex {
+            guard rawSessionID != IntegrationVerificationProbe.rawSessionID,
+                  isValidResumeRouteComponent(rawSessionID) else {
+                return nil
+            }
+            return "codex://threads/\(rawSessionID)"
+        }
+        guard let controllingTTY, isValidTerminalTTYName(controllingTTY) else {
             return nil
         }
-        return "codex://threads/\(rawSessionID)"
+        return "perch-tty://\(controllingTTY)"
     }
 
     private static func validatedResumeURL(
         _ value: String?,
         expectedProvider: AgentProvider
     ) -> String? {
-        guard expectedProvider == .codex,
-              let value,
-              let url = URL(string: value),
-              url.scheme == "codex",
+        guard let value, let url = URL(string: value) else { return nil }
+        if expectedProvider != .codex {
+            guard url.scheme == "perch-tty",
+                  let host = url.host,
+                  url.user == nil,
+                  url.password == nil,
+                  url.port == nil,
+                  url.query == nil,
+                  url.fragment == nil,
+                  url.path.isEmpty,
+                  isValidTerminalTTYName(host),
+                  value == "perch-tty://\(host)" else {
+                return nil
+            }
+            return value
+        }
+        guard url.scheme == "codex",
               url.host == "threads",
               url.user == nil,
               url.password == nil,
@@ -206,6 +230,18 @@ public enum HookPayloadSanitizer {
                 || byte == 95
                 || byte == 126
         }
+    }
+
+    /// macOS pseudo-terminal device basenames are `ttys` plus digits.
+    /// Anything else is not a routable tab and must never reach the
+    /// AppleScript that selects one, so it is rejected at the transport.
+    private static func isValidTerminalTTYName(_ value: String) -> Bool {
+        let bytes = Array(value.utf8)
+        guard (5 ... 16).contains(bytes.count),
+              value.hasPrefix("ttys") else {
+            return false
+        }
+        return bytes.dropFirst(4).allSatisfy { (48 ... 57).contains($0) }
     }
 
     private static func opaqueSessionID(provider: AgentProvider, rawSessionID: String) -> String {

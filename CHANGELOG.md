@@ -9,6 +9,13 @@ All notable user-facing changes to Sleepwing are documented here.
 
 ### Added
 
+- Terminal-hosted tasks now route back to the exact terminal tab: hooks
+  capture the session's controlling tty device name (never contents or
+  paths), it travels as an allowlisted `perch-tty://` resume route, and
+  clicking “Open task” selects that tab in Terminal.app or iTerm2 instead
+  of only activating the app and explaining where the session lives.
+  Unscriptable terminals keep the app-activation fallback. First use asks
+  for macOS automation consent.
 - Optional macOS banners for agent lifecycle edges: one when a task starts
   waiting for you (or fails), one when a task finishes. Banners are skipped
   while the app hosting that session is frontmost (frontmost stops counting
@@ -31,6 +38,23 @@ All notable user-facing changes to Sleepwing are documented here.
 
 ### Changed
 
+- "Open OpenCode" (and other terminal-hosted returns) no longer dead-clicks:
+  if the right terminal is already frontmost the pet says where the session
+  lives instead of silently re-activating it, failures now answer at the pet
+  instead of only in the menu-bar inbox, and any known terminal (Ghostty,
+  kitty, Alacritty, WezTerm…) is now eligible for recall, not just the
+  hardcoded three.
+- Spoken announcements yield to live calls: when any other app is using the
+  microphone, the pet stays quiet and retries on the follow-up cadence —
+  banners and the visual state still deliver. Subagent completions are
+  pinned by test to read as ongoing work, so they can never celebrate or
+  recall. The Integrations page now states the reversibility guarantee
+  where installs happen.
+- "Installed but silently dead" can no longer happen quietly: Sleepwing
+  rescans host configurations about once a minute, and if a hook that has
+  delivered real events before disappears (removed by another tool or an
+  update), the menu bar warns and points to reconnection. Disconnecting
+  inside Sleepwing never triggers the warning.
 - The pet now yields full-screen apps by default: while agents work it stays
   off other apps' full-screen Spaces, and surfaces there only when an agent
   needs you (or fails). A new setting restores the old always-visible

@@ -78,6 +78,9 @@ private struct PerchMenuView: View {
                     notificationWarning
                 }
             }
+            if !model.hookLostProviders.isEmpty {
+                hookLostWarning
+            }
             if model.codexNeedsActivation {
                 codexActivationWarning
             }
@@ -282,6 +285,21 @@ private struct PerchMenuView: View {
         .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .perchCard(fill: PerchTheme.danger.opacity(0.08))
+    }
+
+    private var hookLostWarning: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Label(model.hookLostWarningText, systemImage: "link.badge.plus")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(PerchTheme.attention)
+            Text("integration.hook_lost_detail")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(9)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .perchCard(radius: 10)
     }
 
     private var codexActivationWarning: some View {
@@ -844,7 +862,10 @@ struct SettingsView: View {
             } header: {
                 Text("integration.tools_title")
             } footer: {
-                Text("integration.tools_detail")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("integration.tools_detail")
+                    integrationReversibilityNote
+                }
             }
             Section("integration.timer_mode") {
                 HStack {
@@ -904,6 +925,16 @@ struct SettingsView: View {
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .contain)
+    }
+
+    /// The reversibility promise, stated where install/remove happens:
+    /// competitors have deleted users' unrelated hooks silently, and the
+    /// trust cost of that class of accident is unrecoverable.
+    private var integrationReversibilityNote: some View {
+        Text("integration.reversibility_note")
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var messagesView: some View {

@@ -2,3 +2,4 @@
    语言：中英拼在同一个字符串里，会在同一个对话框里同时出现。 */
 "NSMicrophoneUsageDescription" = "只有你主动开口时 Perch 才聆听——按住桌宠，或点一下麦克风。语音在这台 Mac 上识别，不会离开本机。";
 "NSSpeechRecognitionUsageDescription" = "你说的话完全在这台 Mac 上转成文字，不会发送到任何服务器。";
+"NSAppleEventsUsageDescription" = "点击“打开任务”时，Perch 会让终端选中承载该会话的那个标签页。Perch 不会读取终端内容。";

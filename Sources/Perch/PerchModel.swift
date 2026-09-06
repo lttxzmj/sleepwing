@@ -571,6 +571,25 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
     func lifecycleConnected(_ provider: AgentProvider) -> Bool {
         lifecycleConnectedProviders.contains(provider)
     }
+
+    /// Hooks that worked before but are gone from the host configuration
+    /// now — surfaced proactively so "installed but silent" cannot happen
+    /// to us the way it does to competitors.
+    var hookLostProviders: [AgentProvider] {
+        IntegrationHealthPolicy.lostHooks(
+            everConnected: Set(lastLifecycleEventAt.keys),
+            installed: Set(
+                integrationStatuses.filter { $0.value == .installed }.map(\.key)
+            )
+        ).sorted { $0.rawValue < $1.rawValue }
+    }
+
+    var hookLostWarningText: String {
+        replace(
+            localizedString("integration.hook_lost"),
+            values: ["providers": providerList(Set(hookLostProviders))]
+        )
+    }
     func relayVerified(_ provider: AgentProvider) -> Bool {
         relayVerifiedProviders.contains(provider)
     }
@@ -754,14 +773,19 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
     }
     @discardableResult
     func focusTask(_ task: AgentTaskSummary) -> Bool {
-        if let value = task.resumeURL,
-           let url = URL(string: value),
-           NSWorkspace.shared.open(url) {
-            taskReturnNotice = replace(
-                localizedString("task.opened_exact"),
-                values: ["task": taskTitle(task)]
-            )
-            return true
+        if let value = task.resumeURL, let url = URL(string: value) {
+            // A terminal tab is selected in place via scripting; every
+            // other route is a URL the owning app resolves itself.
+            let opened = url.scheme == "perch-tty"
+                ? url.host.map(TerminalTabRouter.focusTab(ttyName:)) ?? false
+                : NSWorkspace.shared.open(url)
+            if opened {
+                taskReturnNotice = replace(
+                    localizedString("task.opened_exact"),
+                    values: ["task": taskTitle(task)]
+                )
+                return true
+            }
         }
         let activated = focusProvider(task.provider)
         taskReturnNotice = activated
@@ -773,6 +797,11 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
                 localizedString("task.open_failed"),
                 values: ["provider": providerDisplayName(task.provider)]
             )
+        if !activated {
+            // The click happened at the pet; the answer must appear at
+            // the pet, not only in the menu-bar inbox.
+            presentCompanionChat(taskReturnNotice ?? "")
+        }
         return activated
     }
     func taskReturnActionText(_ task: AgentTaskSummary) -> String {
@@ -894,19 +923,38 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             }
         }
         guard terminalHosted else { return false }
+        // Activating an app that is already frontmost changes nothing on
+        // screen — from the click site that reads as a dead button. Say
+        // where the session lives instead of silently "succeeding".
+        func activateTerminal(_ application: NSRunningApplication) -> Bool {
+            if application.bundleIdentifier != nil,
+               application.bundleIdentifier
+                   == NSWorkspace.shared.frontmostApplication?.bundleIdentifier {
+                presentCompanionChat(replace(
+                    localizedString("task.open_terminal_here"),
+                    values: [
+                        "provider": providerDisplayName(provider),
+                        "terminal": application.localizedName ?? "terminal",
+                    ]
+                ))
+                return true
+            }
+            return application.activate(options: [.activateAllWindows])
+        }
         // The terminal the user actually uses outranks any fixed
         // candidate order.
         if let bundleID = lastActivatedTerminalBundleID,
            let application = running.first(where: {
                $0.bundleIdentifier == bundleID
            }) {
-            return application.activate(options: [.activateAllWindows])
+            return activateTerminal(application)
         }
-        for name in ["Terminal", "iTerm2", "Warp"] {
-            if let application = running.first(where: {
-                $0.localizedName?.localizedCaseInsensitiveContains(name) == true
-            }) {
-                return application.activate(options: [.activateAllWindows])
+        // Any known terminal beats a hardcoded name list; Ghostty and
+        // kitty users deserve the same recall as iTerm2 users.
+        for application in running {
+            if let bundleID = application.bundleIdentifier,
+               TerminalHostPolicy.isKnownTerminal(bundleID) {
+                return activateTerminal(application)
             }
         }
         return false
@@ -2046,9 +2094,14 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
         updateCompanionSpaceBehavior()
         companion.setVisible(companionVisible)
         tickTask = Task { [weak self] in
+            var ticks = 0
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(15))
                 await self?.refreshNotificationAuthorization()
+                ticks += 1
+                if ticks % 4 == 0 {
+                    await self?.rescanIntegrationStatusesInBackground()
+                }
                 self?.tick()
             }
         }
@@ -2072,6 +2125,10 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             if integrationStatuses[provider] == .installed {
                 try integrationInstaller.uninstall(provider)
                 clearIntegrationVerification(provider)
+                // An intentional disconnect must not read as external
+                // hook loss later.
+                lastLifecycleEventAt.removeValue(forKey: provider)
+                needsPersist = true
             } else {
                 try integrationInstaller.install(provider)
             }
@@ -2184,6 +2241,20 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
     var allDetectedProvidersConnected: Bool {
         !detectedProviders.isEmpty
             && detectedProviders.allSatisfy { integrationStatuses[$0] == .installed }
+    }
+
+    /// Off-main rescan so hook loss is noticed within a minute without
+    /// blocking the UI on configuration file reads.
+    private func rescanIntegrationStatusesInBackground() async {
+        let statuses = await Task.detached(priority: .utility) {
+            let installer = IntegrationInstaller()
+            return Dictionary(
+                uniqueKeysWithValues: AgentProvider.allCases.map {
+                    ($0, installer.status(for: $0))
+                }
+            )
+        }.value
+        integrationStatuses = statuses
     }
 
     private func refreshIntegrationStatuses() {
@@ -2717,14 +2788,29 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
                 context: voiceContext,
                 at: event.timestamp
             ) == .deliver {
-                enqueueVoiceAnnouncement(
-                    provider: event.provider,
-                    isFailure: event.phase == .failed,
-                    taskLabel: reducer.sessions[sessionKey]?.taskLabel
-                )
-                scheduleVoiceFollowUp(for: sessionKey, announcementsSoFar: 1)
+                if voiceYieldsToLiveCall {
+                    // Try again on the follow-up cadence; the ask may
+                    // outlive the meeting.
+                    scheduleVoiceFollowUp(for: sessionKey, announcementsSoFar: 1)
+                } else {
+                    enqueueVoiceAnnouncement(
+                        provider: event.provider,
+                        isFailure: event.phase == .failed,
+                        taskLabel: reducer.sessions[sessionKey]?.taskLabel
+                    )
+                    scheduleVoiceFollowUp(for: sessionKey, announcementsSoFar: 1)
+                }
             }
         }
+    }
+
+
+    /// A live call outranks the pet's voice: if any other process is
+    /// capturing the microphone, spoken announcements yield. Banners and
+    /// the pet's visual state still deliver.
+    private var voiceYieldsToLiveCall: Bool {
+        !voiceListening && !voiceFinalizing
+            && SystemMicrophoneState.inputRunningSomewhere()
     }
 
     /// The bounded re-announcement ladder for one unresolved ask. Every
@@ -2773,6 +2859,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             context: context,
             at: now
         ) == .deliver else { return }
+        guard !voiceYieldsToLiveCall else { return }
         enqueueVoiceAnnouncement(
             provider: sessionKey.provider,
             isFailure: session.phase == .failed,

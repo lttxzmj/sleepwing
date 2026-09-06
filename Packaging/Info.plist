@@ -19,13 +19,15 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>0.6.0</string>
+	<string>0.6.1</string>
 	<key>CFBundleVersion</key>
-	<string>17</string>
+	<string>18</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>LSUIElement</key>
 	<true/>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>When you click “Open task”, Perch asks your terminal to select the exact tab where the agent session lives. Perch never reads terminal contents.</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Perch contributors</string>
 	<key>NSMicrophoneUsageDescription</key>

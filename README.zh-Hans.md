@@ -48,6 +48,7 @@ brew install --cask lttxzmj/tap/sleepwing
 - 菜单栏和桌宠气泡使用同一套任务语义，而不是把每个会话都压扁成一条通用的 Agent 消息
 - 按真实时钟计算的健康机会计时，并行工作只计一次，遇到需要关注的状态会暂停
 - 传输到本地前先由原生中继层脱敏；只有平台、不透明会话 ID、阶段、时间戳、一个有长度上限的项目/任务标签，以及一条白名单校验过的本地返回路径会进入 App
+- 终端会话精准返回：Hook 只捕获会话的控制终端设备名，点「打开任务」即可在 Terminal.app / iTerm2 中选中承载它的那个标签页（首次需要一次 macOS 自动化授权）；其他宿主保持 App 聚焦
 - 目前支持 Claude Code、本地 Cursor、ChatGPT/Codex、OpenCode、Gemini CLI、TRAE、pi coding agent 的生命周期适配器，安装器可逆，卸载时只清理 Sleepwing 自己写入的部分
 - Codex 回合边界防抖：Hook 收到 `Stop` 后如果任务继续，不会误判为已完成；只有确认的静默窗口或会话结束才算完成
 - 带状态的菜单栏文案、引导流程、可操作的 macOS 通知、中英文双语、本地健康/工作统计，以及原子化持久化

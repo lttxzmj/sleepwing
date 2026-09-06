@@ -18,10 +18,25 @@ enum PerchRelay {
             )
         }
 
-        guard let canonical = try? HookPayloadSanitizer.sanitize(provider: provider, rawData: rawData) else {
+        guard let canonical = try? HookPayloadSanitizer.sanitize(
+            provider: provider,
+            rawData: rawData,
+            controllingTTY: controllingTTYName()
+        ) else {
             return
         }
         FileHandle.standardOutput.write(canonical)
+    }
+
+    /// The hook's stdio is piped, but it inherits the agent's controlling
+    /// terminal; that device basename is the only signal that can route a
+    /// task click back to the exact terminal tab hosting the session.
+    private static func controllingTTYName() -> String? {
+        let fd = open("/dev/tty", O_RDONLY | O_NOCTTY)
+        guard fd >= 0 else { return nil }
+        defer { close(fd) }
+        guard let name = ttyname(fd) else { return nil }
+        return URL(fileURLWithPath: String(cString: name)).lastPathComponent
     }
 
     /// Hooks are outside Perch's trust boundary. Read one byte beyond the

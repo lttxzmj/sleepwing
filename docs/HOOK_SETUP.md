@@ -61,7 +61,11 @@ After installation, Sleepwing sends a reserved, content-free idle probe through 
 
 Use Sleepwing's Integrations page to connect Gemini CLI. Sleepwing merges its command hooks into `~/.gemini/settings.json` for `SessionStart`, `BeforeAgent`, `BeforeTool`, `AfterTool`, `Notification`, `AfterAgent`, and `SessionEnd`. Existing Gemini settings and unrelated hooks are preserved.
 
-Gemini hook payloads can contain prompts, tool inputs, and responses. Sleepwing's native relay discards all of that before transport and keeps only provider, opaque session identifier, phase, and timestamp. See <https://geminicli.com/docs/hooks/reference/>.
+Gemini hook payloads can contain prompts, tool inputs, and responses. Sleepwing's native relay discards all of that before transport and keeps only provider, opaque session identifier, phase, timestamp, a bounded task label, and an allowlisted local resume route. See <https://geminicli.com/docs/hooks/reference/>.
+
+## Exact terminal tab return
+
+For sessions hosted in a terminal, the relay also records the session's controlling tty device name (for example `ttys012`) — never terminal contents, working directories, or window titles. Clicking “Open task” uses that name to select the exact tab in Terminal.app or iTerm2; macOS asks once for automation consent the first time. Terminals without scripting support fall back to app activation.
 
 ## TRAE IDE
 

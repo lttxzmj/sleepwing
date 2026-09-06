@@ -68,6 +68,7 @@ The repository contains the v0.6.0 Beta RC development build:
 - the same task semantics in the menu bar and companion bubble, instead of flattening every session into a generic Agent message
 - wall-clock health opportunity timing that counts parallel work once and pauses for attention
 - native relay sanitization before localhost transport; only provider, opaque session ID, phase, timestamp, a bounded project/task label, and an allowlisted local resume route enter the App
+- exact terminal tab return: hooks capture only the session's controlling tty device name, so “Open task” selects the hosting tab in Terminal.app or iTerm2 (after one-time macOS automation consent); other hosts keep app focus
 - current Claude Code, local Cursor, ChatGPT/Codex, OpenCode, Gemini CLI, TRAE, and pi coding agent lifecycle adapters with reversible installers and ownership-safe removal
 - Codex turn-boundary debouncing that keeps resumed work active and reserves completion for a verified quiet window or session end
 - status-bearing menu-bar label, onboarding, actionable macOS notifications, bilingual copy, local health/work statistics, and atomic persistence

@@ -3,3 +3,4 @@
    string shows both at once inside a single dialog. */
 "NSMicrophoneUsageDescription" = "Perch listens only while you ask it to — holding the companion, or tapping the microphone. Speech is recognized on this Mac and never leaves it.";
 "NSSpeechRecognitionUsageDescription" = "What you say is turned into text entirely on this Mac. Nothing is sent to a server.";
+"NSAppleEventsUsageDescription" = "When you click “Open task”, Perch asks your terminal to select the exact tab where the agent session lives. Perch never reads terminal contents.";

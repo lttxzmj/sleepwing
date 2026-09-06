@@ -523,3 +523,7 @@
 "voice.agent.task" = "任务是：{task}。";
 "ui.feedback" = "反馈";
 "settings.companion_fullscreen" = "在全屏应用上保持可见（关闭时仅在 Agent 需要你时短暂出现）";
+"integration.hook_lost" = "{providers}：钩子在 Sleepwing 之外被移除";
+"integration.hook_lost_detail" = "它此前正常传递过真实事件，但配置现在不见了——可能被其他工具或更新删除。请到 设置 → 连接 重新连接以继续看管。";
+"integration.reversibility_note" = "安装与移除只增删 Sleepwing 自有条目——你已有的钩子和配置会先备份、绝不覆盖，每一步都可逆。";
+"task.open_terminal_here" = "{provider} 就在 {terminal} 的某个标签页里——你已经在正确的应用中；该工具未提供精确到标签页的路由。";

@@ -523,3 +523,7 @@
 "voice.agent.task" = "The task is: {task}.";
 "ui.feedback" = "Feedback";
 "settings.companion_fullscreen" = "Stay visible over full-screen apps (otherwise the pet appears there only when an agent needs you)";
+"integration.hook_lost" = "{providers}: hook removed outside Sleepwing";
+"integration.hook_lost_detail" = "It delivered real events before, but its configuration is gone — another tool or an update likely removed it. Reconnect in Settings → Integrations to keep watching.";
+"integration.reversibility_note" = "Install and remove touch only Sleepwing-owned entries — your existing hooks and settings are backed up first and never overwritten. Every change is reversible.";
+"task.open_terminal_here" = "{provider} is in one of {terminal}'s tabs. You're already in the right app; it doesn't expose an exact tab route.";

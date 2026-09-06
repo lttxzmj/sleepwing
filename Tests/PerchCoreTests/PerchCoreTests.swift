@@ -1631,6 +1631,87 @@ import Testing
     }
 }
 
+@Test func terminalHostedTaskCarriesExactTabRouteFromControllingTTY() throws {
+    let raw = try JSONSerialization.data(withJSONObject: [
+        "hook_event_name": "Stop",
+        "session_id": "abc-123",
+        "cwd": "/Users/alice/Projects/Perch",
+    ])
+    let canonical = try HookPayloadSanitizer.sanitize(
+        provider: .claude,
+        rawData: raw,
+        controllingTTY: "ttys012"
+    )
+    let event = try HookPayloadSanitizer.decodeCanonical(
+        expectedProvider: .claude,
+        data: canonical
+    )
+    #expect(event.resumeURL == "perch-tty://ttys012")
+}
+
+@Test func terminalTabRouteRejectsNonDeviceTTYNames() throws {
+    for tty in ["console", "ttys01; rm -rf", "../ttys001", "ttysabc", "ttys", ""] {
+        let raw = try JSONSerialization.data(withJSONObject: [
+            "hook_event_name": "Stop",
+            "session_id": "abc-123",
+        ])
+        let canonical = try HookPayloadSanitizer.sanitize(
+            provider: .claude,
+            rawData: raw,
+            controllingTTY: tty
+        )
+        let event = try HookPayloadSanitizer.decodeCanonical(
+            expectedProvider: .claude,
+            data: canonical
+        )
+        #expect(event.resumeURL == nil)
+    }
+}
+
+@Test func canonicalTransportRejectsInjectedTerminalTabRoutes() throws {
+    let encoder = JSONEncoder()
+    encoder.dateEncodingStrategy = .iso8601
+    for resumeURL in [
+        "perch-tty://ttys001/extra",
+        "perch-tty://ttys001?unexpected=true",
+        "perch-tty://console",
+        "perch-tty://user@ttys001",
+        "codex://threads/thread",
+        "file:///etc/passwd",
+    ] {
+        let canonical = CanonicalAgentEvent(
+            provider: .claude,
+            sessionID: "opaque",
+            phase: .waitingForInput,
+            timestamp: Date(timeIntervalSince1970: 42),
+            resumeURL: resumeURL
+        )
+        let event = try HookPayloadSanitizer.decodeCanonical(
+            expectedProvider: .claude,
+            data: encoder.encode(canonical)
+        )
+        #expect(event.resumeURL == nil)
+    }
+}
+
+@Test func codexKeepsThreadRouteEvenWhenHookRunsInsideATerminal() throws {
+    let raw = try JSONSerialization.data(withJSONObject: [
+        "hook_event_name": "UserPromptSubmit",
+        "session_id": "019f-thread-123",
+        "prompt": "Review Perch",
+    ])
+    let canonical = try HookPayloadSanitizer.sanitize(
+        provider: .codex,
+        rawData: raw,
+        controllingTTY: "ttys004"
+    )
+    let event = try HookPayloadSanitizer.decodeCanonical(
+        expectedProvider: .codex,
+        data: canonical
+    )
+    #expect(event.resumeURL == "codex://threads/019f-thread-123")
+}
+
 @Test func taskLabelsExtractTheHumanRequestAndRejectAttachmentNoise() throws {
     let wrapped = """
     # Files mentioned by the user:
@@ -2964,4 +3045,32 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
     let bytesPerAtlas = PetSpriteContract.atlasWidth
         * PetSpriteContract.atlasHeight * 4
     #expect(bytesPerAtlas <= 15 * 1024 * 1024)
+}
+
+@Test func hookLossWarnsOnlyAfterProofOfLife() {
+    // "Installed but silently dead" is the top complaint class in this
+    // category. Warning requires prior real events, so fresh installs
+    // stay quiet about tools the user never connected — and an in-app
+    // uninstall clears the proof, leaving only external removal to warn.
+    #expect(IntegrationHealthPolicy.lostHooks(
+        everConnected: [.claude, .cursor], installed: [.cursor]
+    ) == [.claude])
+    #expect(IntegrationHealthPolicy.lostHooks(
+        everConnected: [], installed: []
+    ).isEmpty)
+    #expect(IntegrationHealthPolicy.lostHooks(
+        everConnected: [.pi], installed: [.pi, .codex]
+    ).isEmpty)
+}
+
+@Test func subagentStopReadsAsOngoingWorkNeverAsCompletion() throws {
+    // Competitors let subagent events impersonate the main task (false
+    // celebrations, false errors pulling users back to a healthy run).
+    // A finished subagent means the parent is still working — this pins
+    // that mapping so no subagent event can ever celebrate or recall.
+    let event = try HookEventAdapter.adapt(
+        provider: .claude,
+        data: Data(#"{"hook_event_name":"SubagentStop","session_id":"s1"}"#.utf8)
+    )
+    #expect(event.phase == .working)
 }

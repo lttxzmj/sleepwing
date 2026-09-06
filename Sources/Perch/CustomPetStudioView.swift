@@ -23,7 +23,10 @@ struct CustomPetStudioView: View {
                 .padding(24)
             }
         }
-        .frame(minWidth: 680, minHeight: 590)
+        // The settings window is fixed at 720×600; a sheet must stay
+        // visibly smaller than its host or macOS clamps it against the
+        // window edges. Content scrolls, so a fixed size is safe.
+        .frame(width: 620, height: 520)
         .background(PerchTheme.palette(for: .custom).screenWash)
         .tint(PerchTheme.palette(for: .custom).accent)
         .task {
