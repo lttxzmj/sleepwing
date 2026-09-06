@@ -20,6 +20,15 @@ jobs:
           rel=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "https://api.github.com/repos/lttxzmj/sleepwing/releases/latest")
           echo "releases/latest -> $rel"
           [ "$rel" = "200" ] || fail=1
+          # The download button must point at a fetchable asset — a 200
+          # page with a dead button is the failure mode that cost us our
+          # first three visitors.
+          dl=$(curl -s -m 20 "https://lttxzmj.github.io/sleepwing/" | grep -oE 'downloadUrl: "[^"]+"' | cut -d'"' -f2)
+          echo "button url: $dl"
+          case "$dl" in https://github.com/lttxzmj/sleepwing/releases/download/*) :;; *) echo "bad button url"; fail=1;; esac
+          code=$(curl -sL -o /dev/null -w '%{http_code}' -m 30 "$dl")
+          echo "button asset -> $code"
+          [ "$code" = "200" ] || fail=1
           exit $fail
       - name: Raise an issue so a human (or agent) sees it
         if: failure()
