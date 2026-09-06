@@ -260,6 +260,23 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
     @Published var companionWindowAnchorEnabled = false {
         didSet { if listener != nil { needsPersist = true } }
     }
+    /// Off by default: the pet yields full-screen apps and surfaces over
+    /// them only while an agent needs the user (attention-priority).
+    @Published var companionShowsOverFullScreen = false {
+        didSet {
+            updateCompanionSpaceBehavior()
+            if listener != nil { needsPersist = true }
+        }
+    }
+
+    private func updateCompanionSpaceBehavior() {
+        companionController?.applySpaceBehavior(
+            joinsFullScreen: CompanionWindowPlacement.joinsFullScreenSpaces(
+                showsOverFullScreen: companionShowsOverFullScreen,
+                phase: phase
+            )
+        )
+    }
     @Published var companionMotionEnabled = true {
         didSet { if listener != nil { needsPersist = true } }
     }
@@ -400,6 +417,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             companionSkin = saved.companionSkin ?? .mist
             companionSize = saved.companionSize ?? .medium
             companionLayer = saved.companionLayer ?? .floating
+            companionShowsOverFullScreen = saved.companionShowsOverFullScreen ?? false
             companionMotionEnabled = saved.companionMotionEnabled ?? true
             companionWindowAnchorEnabled = saved.companionWindowAnchorEnabled ?? false
             preventIdleSleepEnabled = saved.preventIdleSleepEnabled ?? false
@@ -2025,6 +2043,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
         let companion = CompanionWindowController(model: self)
         companionController = companion
         companion.apply(size: companionSize, layer: companionLayer)
+        updateCompanionSpaceBehavior()
         companion.setVisible(companionVisible)
         tickTask = Task { [weak self] in
             while !Task.isCancelled {
@@ -3052,6 +3071,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             companionSkin: companionSkin,
             companionSize: companionSize,
             companionLayer: companionLayer,
+            companionShowsOverFullScreen: companionShowsOverFullScreen,
             companionMotionEnabled: companionMotionEnabled,
             companionWindowAnchorEnabled: companionWindowAnchorEnabled,
             preventIdleSleepEnabled: preventIdleSleepEnabled,
@@ -4156,6 +4176,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
         )
         if effectiveReducer.hasFailedSessions {
             phase = .failed
+            updateCompanionSpaceBehavior()
             return
         }
         switch presentationState {
@@ -4170,6 +4191,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
         case .celebrating:
             phase = .done
         }
+        updateCompanionSpaceBehavior()
     }
 
     private func updateOpportunityStage() {

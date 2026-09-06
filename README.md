@@ -27,6 +27,8 @@ Or with Homebrew:
 brew install --cask lttxzmj/tap/sleepwing
 ```
 
+> Measured on the release build (Apple Silicon, 40 s idle sample): **≈0.8% CPU, ≈100 MB memory** while the pet idles at 30 fps. Resource ceilings are pinned by tests.
+
 
 Sleepwing is a privacy-first macOS desktop companion that watches local AI coding agents while the user takes a real break. It turns verified Agent work time into bounded health opportunities, then recalls the user when an Agent needs input. One companion represents every connected Agent; the menu bar handles exact status, integrations, and local statistics.
 

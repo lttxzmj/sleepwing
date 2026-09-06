@@ -153,6 +153,18 @@ final class CompanionWindowController: NSObject, NSWindowDelegate {
         }
     }
 
+    /// Joins or leaves other apps' full-screen Spaces. Only touches the
+    /// panel when the answer changes; collectionBehavior churn can make
+    /// the window server re-place the panel.
+    func applySpaceBehavior(joinsFullScreen: Bool) {
+        let target: NSWindow.CollectionBehavior = joinsFullScreen
+            ? [.canJoinAllSpaces, .fullScreenAuxiliary]
+            : [.canJoinAllSpaces]
+        if panel.collectionBehavior != target {
+            panel.collectionBehavior = target
+        }
+    }
+
     func setVisible(_ visible: Bool) {
         requestedVisible = visible
         if visible {

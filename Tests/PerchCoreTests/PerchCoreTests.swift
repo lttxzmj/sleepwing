@@ -2870,3 +2870,98 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
         fileData: envelope, publicKey: key.publicKey.rawRepresentation
     ) == nil)
 }
+
+// Fixtures drawn from real failures shipped by competing agent watchers
+// (clawd-on-desk #952/#992, vibe-notch #98): a watcher that misreports
+// "done" or flips "waiting" back to "working" loses the user's trust
+// permanently. These lock Sleepwing's protections against that class.
+@Test func lateToolEventsCannotOverrideAnAttentionState() {
+    var reducer = AgentStateReducer()
+    let start = Date(timeIntervalSince1970: 1_790_000_000)
+    reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "s", phase: .working, timestamp: start
+    ))
+    reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "s", phase: .waitingForInput,
+        timestamp: start.addingTimeInterval(10)
+    ))
+    // A tool event generated before the ask but delivered after it must
+    // not flip the session back to working (vibe-notch #98's regression).
+    reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "s", phase: .working,
+        timestamp: start.addingTimeInterval(5)
+    ))
+    #expect(reducer.sessions.values.first?.phase == .waitingForInput)
+    #expect(reducer.aggregatePhase == .waitingForInput)
+}
+
+@Test func attentionOutranksParallelWorkInTheAggregate() {
+    // While one session waits on the user, other running sessions must
+    // not dilute the aggregate into "working" — the user's next action
+    // is answering, not watching (clawd-on-desk #992's flapping).
+    var reducer = AgentStateReducer()
+    let start = Date(timeIntervalSince1970: 1_790_000_000)
+    reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "asks", phase: .waitingForInput, timestamp: start
+    ))
+    reducer.ingest(AgentEvent(
+        provider: .codex, sessionID: "runs", phase: .working,
+        timestamp: start.addingTimeInterval(1)
+    ))
+    reducer.ingest(AgentEvent(
+        provider: .codex, sessionID: "runs", phase: .working,
+        timestamp: start.addingTimeInterval(30)
+    ))
+    #expect(reducer.aggregatePhase == .waitingForInput)
+}
+
+@Test func companionYieldsFullScreenUntilAttentionIsNeeded() {
+    // Attention-priority over full-screen apps: yield while agents work
+    // (the pet over a video is a top competitor complaint), surface the
+    // moment an agent actually needs the user, honor the opt-in always.
+    for phase in [AgentPhase.idle, .working, .done] {
+        #expect(!CompanionWindowPlacement.joinsFullScreenSpaces(
+            showsOverFullScreen: false, phase: phase
+        ))
+    }
+    for phase in [AgentPhase.waitingForInput, .failed] {
+        #expect(CompanionWindowPlacement.joinsFullScreenSpaces(
+            showsOverFullScreen: false, phase: phase
+        ))
+    }
+    #expect(CompanionWindowPlacement.joinsFullScreenSpaces(
+        showsOverFullScreen: true, phase: .idle
+    ))
+}
+
+@Test func resumedSessionsReactivateWithoutDoubleCelebration() {
+    // Competitors lose resumed sessions (their pets stay asleep while
+    // real work continues). A later event on a completed session must
+    // reactivate it — and completion must have fired exactly once.
+    var reducer = AgentStateReducer()
+    let start = Date(timeIntervalSince1970: 1_790_000_000)
+    reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "r", phase: .working, timestamp: start
+    ))
+    let completion = reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "r", phase: .done,
+        timestamp: start.addingTimeInterval(60)
+    ))
+    #expect(completion.didComplete)
+    let resumed = reducer.ingest(AgentEvent(
+        provider: .claude, sessionID: "r", phase: .working,
+        timestamp: start.addingTimeInterval(120)
+    ))
+    #expect(!resumed.didComplete)
+    #expect(reducer.sessions.values.first?.phase == .working)
+    #expect(reducer.aggregatePhase == .working)
+}
+
+@Test func atlasContractStaysInsideTheMemoryBudget() {
+    // A competitor shipped 1.5 GB of duplicate decoded sprites. Our
+    // decoded atlas cost is fixed by the contract; this pins it so a
+    // future contract change cannot silently inflate the budget.
+    let bytesPerAtlas = PetSpriteContract.atlasWidth
+        * PetSpriteContract.atlasHeight * 4
+    #expect(bytesPerAtlas <= 15 * 1024 * 1024)
+}

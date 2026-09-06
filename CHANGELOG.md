@@ -31,6 +31,10 @@ All notable user-facing changes to Sleepwing are documented here.
 
 ### Changed
 
+- The pet now yields full-screen apps by default: while agents work it stays
+  off other apps' full-screen Spaces, and surfaces there only when an agent
+  needs you (or fails). A new setting restores the old always-visible
+  behavior.
 - The product is now named **Sleepwing** (formerly Perch). The bundle
   identifier moved to `app.sleepwing.Sleepwing`; existing hook installs keep
   working because integration markers and local data paths are unchanged.

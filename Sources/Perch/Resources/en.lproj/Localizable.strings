@@ -522,3 +522,4 @@
 "voice.agent.failed" = "{provider} hit a problem and needs you to take a look.";
 "voice.agent.task" = "The task is: {task}.";
 "ui.feedback" = "Feedback";
+"settings.companion_fullscreen" = "Stay visible over full-screen apps (otherwise the pet appears there only when an agent needs you)";

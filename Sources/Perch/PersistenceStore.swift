@@ -97,6 +97,7 @@ struct PersistedSnapshot: Codable {
     var companionSkin: CompanionSkin?
     var companionSize: CompanionSize?
     var companionLayer: CompanionLayer?
+    var companionShowsOverFullScreen: Bool?
     var companionMotionEnabled: Bool?
     var companionWindowAnchorEnabled: Bool?
     var preventIdleSleepEnabled: Bool?

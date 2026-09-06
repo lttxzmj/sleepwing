@@ -464,6 +464,7 @@ struct SettingsView: View {
                     Text("companion.layer.floating").tag(CompanionLayer.floating)
                     Text("companion.layer.desktop").tag(CompanionLayer.desktop)
                 }
+                Toggle("settings.companion_fullscreen", isOn: $model.companionShowsOverFullScreen)
                 Toggle("settings.companion_motion", isOn: $model.companionMotionEnabled)
                 Toggle("settings.companion_chat", isOn: $model.companionChatEnabled)
                 Picker("settings.companion_chat_engine", selection: $model.petChatEngine) {

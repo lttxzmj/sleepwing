@@ -522,3 +522,4 @@
 "voice.agent.failed" = "{provider} 遇到了问题，需要你回来看看。";
 "voice.agent.task" = "任务是：{task}。";
 "ui.feedback" = "反馈";
+"settings.companion_fullscreen" = "在全屏应用上保持可见（关闭时仅在 Agent 需要你时短暂出现）";
