@@ -7,6 +7,8 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.1-beta.1] - 2026-09-06
+
 ### Added
 
 - Terminal-hosted tasks now route back to the exact terminal tab: hooks
@@ -16,25 +18,6 @@ All notable user-facing changes to Sleepwing are documented here.
   of only activating the app and explaining where the session lives.
   Unscriptable terminals keep the app-activation fallback. First use asks
   for macOS automation consent.
-- Optional macOS banners for agent lifecycle edges: one when a task starts
-  waiting for you (or fails), one when a task finishes. Banners are skipped
-  while the app hosting that session is frontmost (frontmost stops counting
-  as watching once keyboard and mouse have been idle for a few minutes),
-  during quiet hours, and for muted sessions; parallel completions from one
-  source collapse into a single banner per 30-second window, and a resolved ask withdraws its own
-  stale banner. Clicking a banner follows the task's allowlisted resume
-  route or activates the hosting app. Both edges have independent toggles
-  in Settings, on by default.
-- An opt-in spoken announcement (off by default) when a task starts needing
-  you: the on-device voice speaks a full sentence — naming the agent, what
-  it is waiting for, and the bounded task label when one exists — so it
-  reaches you away from the screen, without any network synthesis. Agents
-  that stop within a couple of seconds of each other are merged into one
-  spoken summary instead of talking over each other, and while the ask
-  stays unresolved and you stay away it repeats up to two follow-ups at
-  two-minute intervals; any sign of presence, quiet hours, or mute ends
-  the ladder. It follows the same suppression rules as banners and works
-  even when notification permission is denied.
 
 ### Changed
 
@@ -59,6 +42,38 @@ All notable user-facing changes to Sleepwing are documented here.
   off other apps' full-screen Spaces, and surfaces there only when an agent
   needs you (or fails). A new setting restores the old always-visible
   behavior.
+
+### Fixed
+
+- The Pet Studio sheet is sized clearly below its fixed host window instead
+  of covering it edge to edge.
+
+## [0.6.0-beta.1] - 2026-09-03
+
+### Added
+
+- Optional macOS banners for agent lifecycle edges: one when a task starts
+  waiting for you (or fails), one when a task finishes. Banners are skipped
+  while the app hosting that session is frontmost (frontmost stops counting
+  as watching once keyboard and mouse have been idle for a few minutes),
+  during quiet hours, and for muted sessions; parallel completions from one
+  source collapse into a single banner per 30-second window, and a resolved ask withdraws its own
+  stale banner. Clicking a banner follows the task's allowlisted resume
+  route or activates the hosting app. Both edges have independent toggles
+  in Settings, on by default.
+- An opt-in spoken announcement (off by default) when a task starts needing
+  you: the on-device voice speaks a full sentence — naming the agent, what
+  it is waiting for, and the bounded task label when one exists — so it
+  reaches you away from the screen, without any network synthesis. Agents
+  that stop within a couple of seconds of each other are merged into one
+  spoken summary instead of talking over each other, and while the ask
+  stays unresolved and you stay away it repeats up to two follow-ups at
+  two-minute intervals; any sign of presence, quiet hours, or mute ends
+  the ladder. It follows the same suppression rules as banners and works
+  even when notification permission is denied.
+
+### Changed
+
 - The product is now named **Sleepwing** (formerly Perch). The bundle
   identifier moved to `app.sleepwing.Sleepwing`; existing hook installs keep
   working because integration markers and local data paths are unchanged.
