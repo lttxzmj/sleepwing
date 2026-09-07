@@ -83,6 +83,7 @@ The repository contains the v0.6.0 Beta RC development build:
 - local daily and seven-day completed-task counts, kept separate from health outcomes
 - role-specific continuity copy that remembers today's completed breaks and reclaimed time without gamifying screen time
 - an Agent-skill Pet Studio that installs the bundled `perch-pet` workflow, imports validated `.perchpet` packages, and previews their real idle motion
+- auto-discovery of Codex-format pets installed under `~/.codex/pets` — e.g., from the community [Petdex](https://petdex.dev) gallery (`npx petdex install`) or [codexpet.top](https://codexpet.top) — shown in Pet Studio alongside `.perchpet` packages
 - a bundled, agent-neutral `perch-pet` workflow and validator; Codex may delegate specialist production to `hatch-pet` only when that optional skill is already available
 - display-aware companion recovery across screen changes, Space changes, unlock, and wake
 - bounded, revision-aware sprite-atlas caching with state prewarming and frame-boundary scheduling matched to each animation's declared timing

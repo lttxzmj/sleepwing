@@ -63,6 +63,7 @@ brew install --cask lttxzmj/tap/sleepwing
 - 本地每日和七天完成任务计数，与健康产出分开统计
 - 针对不同角色的连续性文案，会记住今天已完成的休息次数和已找回的时间，但不会把屏幕使用时间做成游戏化积分
 - 一个 Agent 技能形式的 Pet Studio，安装内置的 `perch-pet` 工作流，导入经过校验的 `.perchpet` 素材包，并预览其真实的待机动作
+- 自动发现安装在 `~/.codex/pets` 下的 Codex 格式宠物——例如来自社区画廊 [Petdex](https://petdex.dev)（`npx petdex install`）或 [codexpet.top](https://codexpet.top)——与 `.perchpet` 包一同显示在宠物工作室
 - 随 App 提供、适用于不同 Agent 的 `perch-pet` 工作流和校验器；只有用户环境中确实存在可选的 `hatch-pet` Skill 时，Codex 才会把专业制作交给它
 - 屏幕变化、Space 切换、解锁和唤醒时都能保持桌宠可见并正确恢复
 - 有边界、感知版本变化的精灵图集缓存，带状态预热和贴合每个动画声明时长的帧调度

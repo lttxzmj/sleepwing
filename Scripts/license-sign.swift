@@ -7,6 +7,10 @@
 //   swift Scripts/license-sign.swift sign <email> <order-id>
 //       Prints a license file to stdout; redirect it to <order>.perchlicense.
 //
+//   swift Scripts/license-sign.swift verify <license-file> <public-key-hex>
+//       Vendor-side support check: does a customer's license file verify
+//       against the shipped public key? Exits nonzero on any failure.
+//
 // The private key never enters the repository. Verification logic lives
 // in PerchCore/ProLicense.swift so both sides share one tested contract.
 import CryptoKit
@@ -59,6 +63,42 @@ case "sign":
         "signature": signature.base64EncodedString(),
     ])
     print(String(decoding: envelope, as: UTF8.self))
+case "verify":
+    guard arguments.count == 4 else {
+        fail("usage: verify <license-file> <public-key-hex>")
+    }
+    let hex = arguments[3]
+    var keyBytes = [UInt8]()
+    var index = hex.startIndex
+    while index < hex.endIndex {
+        guard let next = hex.index(index, offsetBy: 2, limitedBy: hex.endIndex),
+              let byte = UInt8(hex[index ..< next], radix: 16) else {
+            fail("invalid public key hex")
+        }
+        keyBytes.append(byte)
+        index = next
+    }
+    guard let fileData = try? Data(contentsOf: URL(fileURLWithPath: arguments[2])),
+          fileData.count <= 4 * 1024 else {
+        fail("unreadable or oversized license file")
+    }
+    // Mirrors ProLicense.verify: fail closed on any structural, size,
+    // signature, or field problem.
+    guard let key = try? Curve25519.Signing.PublicKey(rawRepresentation: Data(keyBytes)),
+          let envelope = try? JSONDecoder().decode([String: String].self, from: fileData),
+          let payloadB64 = envelope["payload"], let signatureB64 = envelope["signature"],
+          let payload = Data(base64Encoded: payloadB64),
+          let signature = Data(base64Encoded: signatureB64),
+          key.isValidSignature(signature, for: payload),
+          let fields = try? JSONDecoder().decode([String: String].self, from: payload),
+          fields["edition"] == "pro",
+          let email = fields["email"], !email.isEmpty, email.count <= 254,
+          let order = fields["order"], !order.isEmpty, order.count <= 64,
+          let issued = fields["issued"],
+          ISO8601DateFormatter().date(from: issued) != nil else {
+        fail("INVALID: license does not verify")
+    }
+    print("VALID: pro license for \(email), order \(order), issued \(issued)")
 default:
-    fail("usage: swift Scripts/license-sign.swift keygen | sign <email> <order-id>")
+    fail("usage: swift Scripts/license-sign.swift keygen | sign <email> <order-id> | verify <license-file> <public-key-hex>")
 }
