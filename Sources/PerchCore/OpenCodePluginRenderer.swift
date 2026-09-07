@@ -5,8 +5,22 @@ public enum OpenCodePluginRenderer {
         let relay = javaScriptStringLiteral(relayPath)
         return """
         // Perch integration
-        // Sends only event type, session identifier, a bounded local task label, cwd, and timestamp.
-        import { spawn } from "node:child_process"
+        // Sends only event type, session identifier, a bounded local task label, cwd,
+        // the hosting terminal's device name, and timestamp.
+        import { spawn, execFileSync } from "node:child_process"
+
+        // The relay is spawned detached (so terminal signals never reach it),
+        // which severs its controlling tty. This process is the one attached
+        // to the terminal, so capture the device basename once here — stdin
+        // is the hosting terminal — for the exact-tab return route.
+        let controllingTTY = ""
+        try {
+          const name = execFileSync("/usr/bin/tty", { stdio: ["inherit", "pipe", "ignore"] })
+            .toString().trim().replace("/dev/", "")
+          if (/^ttys[0-9]+$/.test(name)) controllingTTY = name
+        } catch {
+          // Not attached to a terminal: the route is simply omitted.
+        }
 
         export const PerchPlugin = async () => {
           const relay = \(relay)
@@ -25,6 +39,7 @@ public enum OpenCodePluginRenderer {
               session_id: sessionID,
               task_title: sessionLabels.get(sessionID),
               cwd: process.cwd(),
+              tty: controllingTTY || undefined,
               timestamp: new Date().toISOString(),
             })
             try {

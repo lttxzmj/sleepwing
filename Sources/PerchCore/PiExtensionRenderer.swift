@@ -5,8 +5,22 @@ public enum PiExtensionRenderer {
         let relay = javaScriptStringLiteral(relayPath)
         return """
         // Perch integration
-        // Sends only event name, session identifier, cwd, and timestamp to the local Perch relay.
-        import { spawn } from "node:child_process"
+        // Sends only event name, session identifier, cwd, the hosting terminal's
+        // device name, and timestamp to the local Perch relay.
+        import { spawn, execFileSync } from "node:child_process"
+
+        // The relay is spawned detached (so terminal signals never reach it),
+        // which severs its controlling tty. This process is the one attached
+        // to the terminal, so capture the device basename once here — stdin
+        // is the hosting terminal — for the exact-tab return route.
+        let controllingTTY = ""
+        try {
+          const name = execFileSync("/usr/bin/tty", { stdio: ["inherit", "pipe", "ignore"] })
+            .toString().trim().replace("/dev/", "")
+          if (/^ttys[0-9]+$/.test(name)) controllingTTY = name
+        } catch {
+          // Not attached to a terminal: the route is simply omitted.
+        }
 
         export default function (pi) {
           let lastRunFailed = false
@@ -24,6 +38,7 @@ public enum PiExtensionRenderer {
               hook_event_name: eventName,
               session_id: sessionID,
               cwd: process.cwd(),
+              tty: controllingTTY || undefined,
               timestamp: new Date().toISOString(),
             })
             try {

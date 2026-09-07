@@ -1694,6 +1694,53 @@ import Testing
     }
 }
 
+@Test func detachedPluginRelaysFallBackToThePayloadTTY() throws {
+    // OpenCode and pi spawn the relay detached (no controlling terminal),
+    // so the hosting process ships its own tty in the payload; the exact
+    // tab route must survive that path too.
+    let raw = try JSONSerialization.data(withJSONObject: [
+        "type": "session.status",
+        "properties": ["sessionID": "oc1", "status": ["type": "busy"]],
+        "tty": "ttys021",
+    ])
+    let canonical = try HookPayloadSanitizer.sanitize(
+        provider: .opencode,
+        rawData: raw,
+        controllingTTY: nil
+    )
+    let event = try HookPayloadSanitizer.decodeCanonical(
+        expectedProvider: .opencode,
+        data: canonical
+    )
+    #expect(event.resumeURL == "perch-tty://ttys021")
+}
+
+@Test func processTTYOutranksPayloadTTYAndInvalidPayloadTTYIsRejected() throws {
+    let both = try JSONSerialization.data(withJSONObject: [
+        "hook_event_name": "Stop", "session_id": "s", "tty": "ttys999",
+    ])
+    let preferred = try HookPayloadSanitizer.decodeCanonical(
+        expectedProvider: .claude,
+        data: HookPayloadSanitizer.sanitize(
+            provider: .claude, rawData: both, controllingTTY: "ttys001"
+        )
+    )
+    #expect(preferred.resumeURL == "perch-tty://ttys001")
+
+    for tty in ["console", "ttys01; rm -rf", "../ttys001", "/dev/ttys001", ""] {
+        let raw = try JSONSerialization.data(withJSONObject: [
+            "hook_event_name": "Stop", "session_id": "s", "tty": tty,
+        ])
+        let event = try HookPayloadSanitizer.decodeCanonical(
+            expectedProvider: .claude,
+            data: HookPayloadSanitizer.sanitize(
+                provider: .claude, rawData: raw, controllingTTY: nil
+            )
+        )
+        #expect(event.resumeURL == nil)
+    }
+}
+
 @Test func codexKeepsThreadRouteEvenWhenHookRunsInsideATerminal() throws {
     let raw = try JSONSerialization.data(withJSONObject: [
         "hook_event_name": "UserPromptSubmit",

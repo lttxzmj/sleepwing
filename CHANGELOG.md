@@ -7,6 +7,18 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.3-beta.1] - 2026-09-07
+
+### Fixed
+
+- The exact terminal tab return now also works for OpenCode and pi: their
+  plugin/extension spawns the relay detached (a new session with no
+  controlling terminal), so the tab route was never generated on those
+  surfaces. The hosting process now captures its own terminal device name
+  once at load and ships it in the payload; the relay validates it exactly
+  like a process-derived name, and a process-derived name still wins.
+  Restart OpenCode / pi once so the upgraded plugin loads.
+
 ## [0.6.2-beta.1] - 2026-09-07
 
 ### Fixed

@@ -65,10 +65,15 @@ public enum HookPayloadSanitizer {
             timestamp: receivedAt,
             taskLabel: taskIdentity?.label,
             taskLabelKind: taskIdentity?.kind,
+            // Plugin-hosted providers (OpenCode, pi) spawn the relay
+            // detached — a new session with no controlling terminal — so
+            // the hosting process captures its own tty and ships it in
+            // the payload. The process-derived name wins when both exist;
+            // either way the value passes the same strict validation.
             resumeURL: resumeURL(
                 provider: provider,
                 rawSessionID: event.sessionID,
-                controllingTTY: controllingTTY
+                controllingTTY: controllingTTY ?? payloadControllingTTY(rawData)
             )
         )
         let encoder = JSONEncoder()
@@ -230,6 +235,15 @@ public enum HookPayloadSanitizer {
                 || byte == 95
                 || byte == 126
         }
+    }
+
+    private static func payloadControllingTTY(_ rawData: Data) -> String? {
+        guard let object = try? JSONSerialization.jsonObject(with: rawData) as? [String: Any],
+              let tty = object["tty"] as? String,
+              isValidTerminalTTYName(tty) else {
+            return nil
+        }
+        return tty
     }
 
     /// macOS pseudo-terminal device basenames are `ttys` plus digits.
