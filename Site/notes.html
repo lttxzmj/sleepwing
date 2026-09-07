@@ -38,6 +38,15 @@ footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid v
 <!-- Newest note goes directly below this line. -->
 
 <article>
+<h2>Landing on the exact terminal tab</h2>
+<time datetime="2026-09-07">September 7, 2026</time>
+<p>Two beta builds went out this week — 0.6.1 (build 18) and 0.6.2 (build 19) — and both exist for one feature: clicking a waiting task now lands on the exact terminal tab hosting that agent session, not just the right app. If you run a dozen tabs across iTerm and Terminal.app, "Codex is waiting for you" used to mean tab-hunting. Now the hook records the session's controlling-TTY device name (never contents, never paths), it travels as an allowlisted local resume route, and the click selects that specific tab. Unscriptable terminals keep the activate-the-app fallback, and any known terminal — Ghostty, kitty, Alacritty, WezTerm — is now eligible for recall, not just a hardcoded three.</p>
+<p>Build 19 exists because of a genuinely annoying macOS detail: the relay first asked <code>ttyname()</code> about an opened <code>/dev/tty</code>, and macOS answers with the alias itself — literally "/dev/tty" — which routes nowhere. The fix reads the process's own <code>e_tdev</code> from <code>sysctl</code>'s <code>kinfo_proc</code> and resolves it with <code>devname()</code>, which yields the real device the tab owns.</p>
+<p>Also shipped: a proactive warning when a previously-working hook disappears from a host's config (rescanned about once a minute), so an integration can no longer die silently, and the pet now yields full-screen Spaces until an agent actually needs you.</p>
+<p class="zh"><b>中文速览：</b>本周连发两个测试版（0.6.1 build 18、0.6.2 build 19），都为了同一件事：点击等待中的任务，直接落到该会话所在的那个终端标签页，而不是只把终端调到前台。钩子只记录会话的控制终端设备名（不含任何内容或路径），经允许清单内的本地路由回跳。build 19 修的是一个 macOS 细节：对已打开的 <code>/dev/tty</code> 调 <code>ttyname()</code> 返回的是别名本身，改从 <code>sysctl</code> 的 <code>kinfo_proc.e_tdev</code> 读真实设备。另外：钩子被其他工具移除时约一分钟内会主动告警，桌宠默认让出全屏空间、只在 agent 需要你时出现。</p>
+</article>
+
+<article>
 <h2>First public release week</h2>
 <time datetime="2026-09-04">September 4, 2026</time>
 <p>The notarized 0.6.0 build 17 went out on GitHub Releases this week — Sleepwing's first public beta, signed with a Developer ID and stapled, macOS 14+ on Apple Silicon. The release script fails closed: if notarization doesn't come back clean, nothing ships.</p>

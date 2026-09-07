@@ -7,6 +7,13 @@
 <description>Build-in-public notes from Sleepwing — the privacy-first macOS desktop pet that watches your AI coding agents.</description>
 <language>en</language>
 <item>
+<title>Landing on the exact terminal tab</title>
+<link>https://lttxzmj.github.io/sleepwing/notes.html</link>
+<guid isPermaLink="false">sleepwing-note-2026-09-07</guid>
+<pubDate>Mon, 07 Sep 2026 03:30:00 GMT</pubDate>
+<description>Builds 18 and 19 shipped so a task click lands on the exact terminal tab hosting the session, via the controlling-TTY device name — including the macOS ttyname()/e_tdev detour that forced the second build. Plus hook-loss warnings and full-screen yield.</description>
+</item>
+<item>
 <title>Sleepwing 0.6.0 beta ships notarized; celebration timing fixed; five guide pages live</title>
 <link>https://lttxzmj.github.io/sleepwing/notes.html</link>
 <guid isPermaLink="false">sleepwing-note-2026-09-04</guid>
