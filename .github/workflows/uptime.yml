@@ -26,8 +26,12 @@ jobs:
           dl=$(curl -s -m 20 "https://lttxzmj.github.io/sleepwing/" | grep -oE 'downloadUrl: "[^"]+"' | cut -d'"' -f2)
           echo "button url: $dl"
           case "$dl" in https://github.com/lttxzmj/sleepwing/releases/download/*) :;; *) echo "bad button url"; fail=1;; esac
-          code=$(curl -sL -o /dev/null -w '%{http_code}' -m 30 "$dl")
-          echo "button asset -> $code"
+          # HEAD, not GET: a full download here would increment the
+          # release download counter — the north-star metric — once per
+          # day. HEAD follows the same redirect chain and proves the
+          # asset resolves without being counted.
+          code=$(curl -sIL -o /dev/null -w '%{http_code}' -m 30 "$dl")
+          echo "button asset (HEAD) -> $code"
           [ "$code" = "200" ] || fail=1
           exit $fail
       - name: Raise an issue so a human (or agent) sees it
