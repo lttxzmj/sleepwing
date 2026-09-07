@@ -7,6 +7,16 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.2-beta.1] - 2026-09-07
+
+### Fixed
+
+- The exact terminal tab route shipped in 0.6.1 was never actually attached:
+  on macOS, `ttyname` on an opened `/dev/tty` reports the alias itself, so
+  the relay found no routable device and every click fell back to app
+  activation. The relay now reads the controlling terminal from the
+  process's own record, and the route survives an end-to-end pty test.
+
 ## [0.6.1-beta.1] - 2026-09-06
 
 ### Added

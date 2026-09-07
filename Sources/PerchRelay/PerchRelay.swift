@@ -31,12 +31,18 @@ enum PerchRelay {
     /// The hook's stdio is piped, but it inherits the agent's controlling
     /// terminal; that device basename is the only signal that can route a
     /// task click back to the exact terminal tab hosting the session.
+    /// `ttyname` on an opened `/dev/tty` reports the alias itself on macOS,
+    /// so the real device has to come from the process's own `e_tdev`.
     private static func controllingTTYName() -> String? {
-        let fd = open("/dev/tty", O_RDONLY | O_NOCTTY)
-        guard fd >= 0 else { return nil }
-        defer { close(fd) }
-        guard let name = ttyname(fd) else { return nil }
-        return URL(fileURLWithPath: String(cString: name)).lastPathComponent
+        var mib: [Int32] = [CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid()]
+        var info = kinfo_proc()
+        var size = MemoryLayout<kinfo_proc>.stride
+        guard sysctl(&mib, 4, &info, &size, nil, 0) == 0 else { return nil }
+        let device = info.kp_eproc.e_tdev
+        guard device != -1, let name = devname(device, mode_t(S_IFCHR)) else {
+            return nil
+        }
+        return String(cString: name)
     }
 
     /// Hooks are outside Perch's trust boundary. Read one byte beyond the
