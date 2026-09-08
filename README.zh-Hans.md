@@ -17,9 +17,7 @@ Sleepwing 是一款隐私优先的 macOS 桌面陪伴应用，在本地 AI 编�
 </p>
 
 <p align="center">
-  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="睡眠中的眠翼鸟">
-  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="探头叫你回来的眠翼鸟">
-  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="庆祝任务完成的眠翼鸟">
+  <img src="Site/assets/sleepwing-hero.gif" width="700" alt="示意动图：Agent 干活时桌宠守望，需要你时叫你回来，完成时庆祝">
 </p>
 
 <p align="center">

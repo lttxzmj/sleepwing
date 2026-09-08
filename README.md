@@ -13,9 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="Site/assets/sleepwing-idle.gif" width="96" alt="Sleepwing keeping watch while agents work">
-  <img src="Site/assets/sleepwing-waiting.gif" width="96" alt="Sleepwing calling you back">
-  <img src="Site/assets/sleepwing-celebrate.gif" width="96" alt="Sleepwing celebrating a completed task">
+  <img src="Site/assets/sleepwing-hero.gif" width="700" alt="Illustrative loop: your agents work while the pet keeps watch, calls you back when one needs input, and celebrates when the task completes">
 </p>
 
 <p align="center">
@@ -34,21 +32,11 @@ Sleepwing is a privacy-first macOS desktop companion that watches local AI codin
 
 > When AI takes over the work, Sleepwing gives the time back to your body—and calls you back when it is your turn.
 
-<p align="center">
-  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="Sleepwing resting while agents work">
-  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="Sleepwing calling you back">
-  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="Sleepwing celebrating a finished task">
-</p>
 
 <p align="center">
   <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the notarized beta</b></a> · free · macOS 14+ · Apple Silicon · zero outbound network
 </p>
 
-<p align="center">
-  <img src="Site/assets/sleepwing-idle.gif" width="144" alt="Sleepwing resting while agents work">
-  <img src="Site/assets/sleepwing-waiting.gif" width="144" alt="Sleepwing calling you back">
-  <img src="Site/assets/sleepwing-celebrate.gif" width="144" alt="Sleepwing celebrating a finished task">
-</p>
 
 <p align="center">
   <a href="https://github.com/lttxzmj/sleepwing/releases/latest"><b>⬇ Download the notarized beta</b></a> · free · macOS 14+ · Apple Silicon · zero outbound network
