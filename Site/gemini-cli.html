@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get notified when Gemini CLI finishes (macOS) — hooks, DIY, and a desktop pet</title>
+<meta name="description" content="Stop watching the terminal: how to get a macOS notification when Gemini CLI finishes a task — shell chaining for one-shot runs, Gemini's official hooks in settings.json, and a free desktop pet that watches all your agents.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/gemini-cli.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Get notified when Gemini CLI finishes (macOS)">
+<meta property="og:description" content="Gemini CLI hooks, honest options, and a free pet that watches Gemini CLI alongside your other agents.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.55em;line-height:1.35}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Get notified when Gemini CLI finishes (macOS)</h1>
+<p class="lead">Gemini CLI can grind through a task for minutes and then just… sit there, done, while you're in another window. Here are your options, from a one-line shell trick to a full watcher, honestly compared.</p>
+
+<h2>Option 1 — shell chaining (one-shot runs, free)</h2>
+<p>If you run Gemini non-interactively with <code>-p</code>, the shell already knows when it's done. No config needed:</p>
+<pre><code>gemini -p "refactor the parser" ; afplay /System/Library/Sounds/Glass.aiff</code></pre>
+<p>Honest limits: this only works for one-shot prompts — in an interactive session the process doesn't exit between turns, so nothing plays. And the terminal bell tells you nothing about <em>whether it worked</em>.</p>
+
+<h2>Option 2 — Gemini CLI's official hooks (DIY, free)</h2>
+<p>Gemini CLI supports lifecycle hooks in <code>~/.gemini/settings.json</code> (<a href="https://geminicli.com/docs/hooks/reference/">official reference</a>). The <code>AfterAgent</code> event fires when the agent finishes a turn — a minimal example that plays a sound:</p>
+<pre><code>{
+  "hooks": {
+    "AfterAgent": [
+      {
+        "matcher": "",
+        "hooks": [
+          { "type": "command", "command": "afplay /System/Library/Sounds/Glass.aiff" }
+        ]
+      }
+    ]
+  }
+}</code></pre>
+<p>Honest limits: one sound for every outcome — no distinction between finished, failed, and waiting-for-permission (you'd wire <code>Notification</code> separately for that); nothing tells you <em>which</em> session; and <code>settings.json</code> also holds your theme and other Gemini settings, so merge carefully rather than pasting over the whole file.</p>
+
+<h2>Option 3 — a watcher that treats Gemini CLI as one of your agents</h2>
+<p><a href="index.html">Sleepwing</a> (free beta) merges its hooks into <code>~/.gemini/settings.json</code> for <code>SessionStart</code>, <code>BeforeAgent</code>, <code>BeforeTool</code>, <code>AfterTool</code>, <code>Notification</code>, <code>AfterAgent</code> and <code>SessionEnd</code> — reversibly, preserving your existing settings and unrelated hooks — and puts one pet on your desktop that:</p>
+<ul>
+<li>distinguishes <b>working / waiting-for-you / finished / failed</b>, per session;</li>
+<li>brings you back to the exact terminal tab with one click, and covers your other agents too (Claude Code, Cursor, Codex, OpenCode, TRAE, pi) with the same pet;</li>
+<li>turns agent work time into small real breaks — paused the moment Gemini waits on you;</li>
+<li>makes <b>zero</b> outbound network requests. This matters more here than usual: Gemini's hook payloads can contain prompts, tool inputs, and responses. Sleepwing discards all of that locally before anything moves, keeping only the provider, an opaque session ID, the phase, a timestamp, a bounded task label, and a local resume route. <a href="https://github.com/lttxzmj/sleepwing">Grep the source.</a></li>
+</ul>
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the notarized beta (macOS 14+, Apple Silicon)</a></p>
+
+<div class="note"><b>Pick by situation:</b> scripted one-shot <code>gemini -p</code> runs → shell chaining is enough, don't install anything. Comfortable with JSON and only Gemini → the DIY hook. Multiple agents a day, or you want failed and waiting-for-you to sound different from done → that's what Sleepwing is for.</div>
+
+<h2>中文速览</h2>
+<p>Gemini CLI 跑长任务结束时不会主动提醒你。方案：一次性任务直接用 shell 串联 <code>gemini -p "…" ; afplay …</code>（交互式会话无效）；或在 <code>~/.gemini/settings.json</code> 里给官方 <code>AfterAgent</code> Hook 挂音效（上面有例子，注意与已有设置合并、不要整体覆盖）；或用 <a href="index.html">Sleepwing</a> 桌宠——可逆安装官方 Hooks，区分「工作中/等你/完成/失败」，一键跳回终端标签页，还同时看管 Claude Code、Cursor、Codex 等其他 Agent。Gemini 的 Hook 载荷可能包含提示词和代码，Sleepwing 在本地全部丢弃、零外联。免费 Beta。</p>
+
+<footer>
+Facts checked 2026-09; corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+See also: <a href="cursor.html">the Cursor guide</a> · <a href="guide-agent-notifications.html">the Claude Code / Codex guide</a> · <a href="compare.html">Sleepwing vs the alternatives</a>.
+</footer>
+</main>
+</body>
+</html>
