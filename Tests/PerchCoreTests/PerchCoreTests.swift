@@ -3121,3 +3121,52 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
     )
     #expect(event.phase == .working)
 }
+
+@Test func lateCodexPermissionHookCannotCancelAGatedCompletionOrFakeAnAsk() {
+    // User-reported phantom: the pet said Codex needed approval, but the
+    // ChatGPT app had nothing to approve and the state would not clear.
+    // Root cause: hooks arrive out of order; a pre-Stop PermissionRequest
+    // delivered after the turn's Stop used to cancel the gated completion
+    // and leave the session stuck in waitingForInput for hours.
+    var gate = CodexCompletionGate()
+    let start = Date(timeIntervalSince1970: 1_790_000_000)
+    let stop = AgentEvent(
+        provider: .codex, sessionID: "t", phase: .done,
+        timestamp: start, sourceEventName: "stop"
+    )
+    #expect(gate.route(stop) == nil)
+    #expect(gate.pendingCount == 1)
+
+    // The late ask is dropped and the completion survives.
+    let lateAsk = AgentEvent(
+        provider: .codex, sessionID: "t", phase: .waitingForInput,
+        timestamp: start.addingTimeInterval(0.3),
+        sourceEventName: "permissionrequest"
+    )
+    #expect(gate.route(lateAsk) == nil)
+    #expect(gate.pendingCount == 1)
+    let drained = gate.drain(at: start.addingTimeInterval(6))
+    #expect(drained.count == 1)
+    #expect(drained.first?.phase == .done)
+
+    // A genuine new ask still gets through: the new turn's working events
+    // clear the gate before the ask arrives.
+    let stop2 = AgentEvent(
+        provider: .codex, sessionID: "t", phase: .done,
+        timestamp: start.addingTimeInterval(10), sourceEventName: "stop"
+    )
+    #expect(gate.route(stop2) == nil)
+    let newTurn = AgentEvent(
+        provider: .codex, sessionID: "t", phase: .working,
+        timestamp: start.addingTimeInterval(11),
+        sourceEventName: "userpromptsubmit"
+    )
+    #expect(gate.route(newTurn)?.phase == .working)
+    #expect(gate.pendingCount == 0)
+    let genuineAsk = AgentEvent(
+        provider: .codex, sessionID: "t", phase: .waitingForInput,
+        timestamp: start.addingTimeInterval(12),
+        sourceEventName: "permissionrequest"
+    )
+    #expect(gate.route(genuineAsk)?.phase == .waitingForInput)
+}

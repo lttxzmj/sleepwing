@@ -16,6 +16,18 @@ public struct CodexCompletionGate: Sendable {
         let key = AgentSessionKey(provider: event.provider, sessionID: event.sessionID)
         guard Self.isProvisionalCompletion(event) else {
             if let current = pending[key], event.timestamp >= current.timestamp {
+                // Hooks are fired as independent detached processes, so
+                // arrival order is not firing order. A permission ask can
+                // only happen mid-turn — every turn opens with prompt/tool
+                // hooks before any ask — so an ask arriving while this
+                // turn's Stop is already pending is a late pre-Stop hook,
+                // not a new ask. Letting it through would both fabricate a
+                // phantom "needs you" (with nothing left to approve) and
+                // cancel the real completion. A genuine new ask is safe:
+                // its preceding prompt/tool events clear the gate first.
+                if event.phase == .waitingForInput {
+                    return nil
+                }
                 pending.removeValue(forKey: key)
             }
             return event

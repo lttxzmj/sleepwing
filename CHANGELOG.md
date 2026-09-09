@@ -7,6 +7,18 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.4-beta.1] - 2026-09-09
+
+### Fixed
+
+- Phantom "Codex needs your approval": hooks arrive as independent
+  processes, so a pre-Stop PermissionRequest could be delivered after the
+  turn's Stop — it then cancelled the gated completion and left the session
+  stuck in "waiting for input" with nothing to approve. The completion gate
+  now drops an ask that arrives while that turn's completion is pending;
+  genuine new asks are unaffected because their turn's prompt/tool events
+  clear the gate first.
+
 ## [0.6.3-beta.1] - 2026-09-07
 
 ### Fixed
