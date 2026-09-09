@@ -18,5 +18,9 @@ jobs:
           echo "using $latest"
           sudo xcode-select -s "$latest"
           swift --version
+      - name: Quality gate (pattern rules)
+        env:
+          QUALITY_GATE_SKIP_BUILD: "1"
+        run: sh Scripts/quality-gate.sh
       - name: Run deterministic test suite
         run: swift test
