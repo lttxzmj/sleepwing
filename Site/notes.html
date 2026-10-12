@@ -38,6 +38,16 @@ footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid v
 <!-- Newest note goes directly below this line. -->
 
 <article>
+<h2>When the signal stops, say so</h2>
+<time datetime="2026-10-12">October 12, 2026</time>
+<p>A zero-commit week — so this note explains a shipped behavior that rarely gets explained: what Sleepwing does when an agent goes quiet. Hook delivery is best-effort by design; it never blocks the host agent, which means signals can simply stop arriving.</p>
+<p>If a "working" session produces no lifecycle event for 30 minutes, Sleepwing stops vouching for it. The task stays visible but flips to "No recent signal · status unconfirmed": the pet's aggregate mood stops counting it as active work, health timing and sleep protection pause, and nothing pretends to be done. The next real provider event clears the flag and the same task resumes in place; only a full two hours of silence removes it entirely.</p>
+<p>The threshold is 30 minutes, not the original ten, for a concrete reason: providers report liveness per turn and per tool launch, so one long tool run — a full test suite, a slow model call — is silent the whole time it works. Ten minutes cut those off mid-run and told you your agent had stopped while it was still going. The state machine lives in a deterministic reducer in PerchCore, with unit tests pinning both edges of the threshold and the resume path.</p>
+<p>This week handed us the same lesson on the ops side: our own metrics cron turned out to have been down for 17 days (September 23 – October 9), discovered only at weekly review. Fail-closed logs nobody reads are just silent failures with a paper trail. A stopped signal should be loudly unconfirmed — in the product, and in the pipeline that builds it.</p>
+<p class="zh"><b>中文速览：</b>本周零提交，就讲一个很少被解释的已上线行为：agent 没了动静时 Sleepwing 怎么办。钩子投递本就是尽力而为，信号可能随时断。「工作中」的会话 30 分钟没有新的生命周期事件，任务会标为「暂未收到新信号 · 状态待确认」：桌宠不再把它计入活跃工作，健康计时与睡眠保护暂停，绝不假装完成；下一个真实事件到达即原地恢复，沉默满两小时才移除。阈值从 10 分钟调到 30 分钟，是因为一次长工具调用（比如跑完整测试）全程无信号，10 分钟会把它误判成停了。本周运维侧也上了同一课：metrics 定时任务静默停摆 17 天（9/23–10/9），周报组装时才发现——没人读的 fail-closed 日志等于留了底的静默失败。</p>
+</article>
+
+<article>
 <h2>Landing on the exact terminal tab</h2>
 <time datetime="2026-09-07">September 7, 2026</time>
 <p>Two beta builds went out this week — 0.6.1 (build 18) and 0.6.2 (build 19) — and both exist for one feature: clicking a waiting task now lands on the exact terminal tab hosting that agent session, not just the right app. If you run a dozen tabs across iTerm and Terminal.app, "Codex is waiting for you" used to mean tab-hunting. Now the hook records the session's controlling-TTY device name (never contents, never paths), it travels as an allowlisted local resume route, and the click selects that specific tab. Unscriptable terminals keep the activate-the-app fallback, and any known terminal — Ghostty, kitty, Alacritty, WezTerm — is now eligible for recall, not just a hardcoded three.</p>
