@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check every public page
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           fail=0
           for u in "" compare.html guide-agent-notifications.html trae.html gallery.html llms.txt; do
@@ -17,7 +19,17 @@ jobs:
             echo "/$u -> $code"
             [ "$code" = "200" ] || fail=1
           done
-          rel=$(curl -s -o /dev/null -w '%{http_code}' -m 20 "https://api.github.com/repos/lttxzmj/sleepwing/releases/latest")
+          # Authenticated + retried: runners share IPs, and an anonymous
+          # api.github.com call can 403 on rate limits — that false alarm
+          # paged a human on 2026-10-01 while every real surface was fine.
+          rel=000
+          for attempt in 1 2 3; do
+            rel=$(curl -s -o /dev/null -w '%{http_code}' -m 20 \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              "https://api.github.com/repos/lttxzmj/sleepwing/releases/latest")
+            [ "$rel" = "200" ] && break
+            sleep 10
+          done
           echo "releases/latest -> $rel"
           [ "$rel" = "200" ] || fail=1
           # The download button must point at a fetchable asset — a 200
