@@ -99,7 +99,21 @@ if [ "$require_distribution" = "1" ]; then
   identity_line=$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null \
     | /usr/bin/grep -F "$identity" \
     | /usr/bin/head -n 1 || true)
-  [ -n "$identity_line" ] || fail "the requested signing identity is not available in the keychain"
+  if [ -z "$identity_line" ]; then
+    # Say which side is actually broken. The old wording ("identity not
+    # available in the keychain") sent a 2026-10-16 release diagnosis
+    # toward an expired certificate when the real cause was a malformed
+    # PERCH_SIGN_IDENTITY inherited from the calling shell. An owner-side
+    # credential failure and a bad input deserve different first moves.
+    available=$(/usr/bin/security find-identity -v -p codesigning 2>/dev/null \
+      | /usr/bin/grep -F "Developer ID Application:" || true)
+    printf 'requested signing identity: %s\n' "$identity" >&2
+    if [ -n "$available" ]; then
+      printf 'keychain Developer ID identities present:\n%s\n' "$available" >&2
+      fail "PERCH_SIGN_IDENTITY matches none of them — check the value passed in (env or config), not the certificate"
+    fi
+    fail "no Developer ID Application certificate is in the keychain — this one is owner-side"
+  fi
   printf '%s\n' "$identity_line" | /usr/bin/grep -F "Developer ID Application:" >/dev/null \
     || fail "the release identity must be a Developer ID Application certificate"
 

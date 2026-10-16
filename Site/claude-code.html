@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sleepwing for Claude Code (macOS) — setup, what each hook does, and honest limits</title>
+<meta name="description" content="Set up Claude Code notifications on macOS with Sleepwing: which official hooks get installed, what the pet does for working, waiting-for-permission, finished and failed, plus the free DIY hook if you'd rather not install an app.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/claude-code.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="Sleepwing for Claude Code (macOS) — setup and what each hook does">
+<meta property="og:description" content="The official Claude Code hooks Sleepwing installs, what the pet shows per state, the honest limits, and the free DIY alternative.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.55em;line-height:1.35}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>Sleepwing for Claude Code (macOS): setup, what each hook does, and honest limits</h1>
+<p class="lead">Claude Code runs for minutes, then stops — sometimes finished, sometimes waiting for a permission, sometimes failed. This page is the setup guide: which official hooks Sleepwing installs, what the pet does in each state, and where the coverage ends. If you'd rather not install an app, the free DIY hook is further down and it's a perfectly good answer.</p>
+
+<h2>Setup (about a minute)</h2>
+<ol>
+<li>Install the notarized beta — <a href="https://github.com/lttxzmj/sleepwing/releases/latest">download and unzip</a>, or <code>brew install --cask lttxzmj/tap/sleepwing</code> (macOS 14+, Apple Silicon).</li>
+<li>Open Sleepwing's <b>Integrations</b> page and connect Claude Code. It merges its own commands into the existing <code>hooks</code> object in <code>~/.claude/settings.json</code> and leaves unrelated hooks of yours alone; removing the integration deletes only Sleepwing's own entries.</li>
+<li>Run any task in Claude Code and watch the pet change state.</li>
+</ol>
+<p>The installed commands all point at one local relay script, so the shape in your settings file is the ordinary official one (<a href="https://code.claude.com/docs/en/hooks" rel="nofollow">Claude Code hooks docs</a>) — nothing proprietary, and you can read it before and after.</p>
+
+<h2>What each hook does</h2>
+<p>Sleepwing subscribes to eight official events, and each one maps to exactly one thing on your desktop:</p>
+<ul>
+<li><code>UserPromptSubmit</code> — a turn starts: the pet switches to <b>working</b> and the session shows up in the menu bar.</li>
+<li><code>PreToolUse</code> / <code>PostToolUse</code> — still working; these keep a long run from looking stalled.</li>
+<li><code>PermissionRequest</code> — <b>waiting for you</b>. This is the state worth leaving your desk for, because nothing moves until you answer.</li>
+<li><code>Notification</code> — also <b>waiting for you</b>, but only for the attention-bearing types: <code>permission_prompt</code>, <code>idle_prompt</code>, <code>elicitation_dialog</code>, <code>agent_needs_input</code>. Other notification types are ignored on purpose so the pet doesn't cry wolf.</li>
+<li><code>Stop</code> — <b>finished</b>.</li>
+<li><code>StopFailure</code> — <b>failed</b>, handled as a content-free failure rather than a completion. A <code>SessionEnd</code> arriving at the same moment cannot immediately erase it, so a failed run doesn't get quietly reported as done.</li>
+<li><code>SessionEnd</code> — the session is cleared from the list.</li>
+</ul>
+<p>Clicking <b>Open task</b> on a waiting session returns you to the exact terminal tab in Terminal.app or iTerm2. That works because the relay records the session's controlling tty device name (for example <code>ttys012</code>) — not terminal contents, not working directories, not window titles. macOS asks once for automation consent; terminals without scripting support fall back to activating the app.</p>
+<p>While Claude Code is working, that time counts toward small breaks — water, stretch, look away — and the break timer pauses the moment a session is waiting on you, so you're not nudged to rest while the agent needs an answer.</p>
+
+<h2>Honest limits</h2>
+<ul>
+<li>Claude Code is a <b>supported</b> integration. The failure path has been exercised in a real session; a full verified end-to-end lifecycle in our acceptance window exists for pi, Codex and OpenCode, not yet for Claude Code. Treat the state machine as supported, not as a measured reliability number.</li>
+<li>Hook delivery is best-effort and never blocks Claude Code. If the app isn't running, events are dropped rather than queued — you lose a notification, not a turn.</li>
+<li>Exact-tab return covers Terminal.app and iTerm2; other terminals activate the app and you pick the tab.</li>
+<li>Apple Silicon, macOS 14+. No Intel build, no Linux, no Windows.</li>
+</ul>
+
+<h2>If you'd rather not install an app</h2>
+<p>Two free options, in order of effort. Both are legitimate; use one if it fits.</p>
+<p><b>The terminal bell.</b> In Claude Code run <code>/config</code> and enable the notification/bell preference; Terminal.app and iTerm2 can both post a system notification on a bell. One session in one terminal, zero files touched.</p>
+<p><b>A DIY hook.</b> Claude Code hooks can run any command. A minimal <code>~/.claude/settings.json</code> that plays one sound when the agent needs you and another when it stops:</p>
+<pre><code>{
+  "hooks": {
+    "Notification": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Glass.aiff" }] }],
+    "Stop": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Funk.aiff" }] }]
+  }
+}</code></pre>
+<p>Merge this into your existing <code>hooks</code> object rather than replacing the file. Honest limits: every <code>Notification</code> sounds the same, so a permission ask and an idle prompt are indistinguishable; nothing tells you <em>which</em> project just finished; and you'll rebuild it per agent, since Codex, Cursor and Gemini CLI each use a different hook format.</p>
+
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the notarized beta (macOS 14+, Apple Silicon)</a></p>
+
+<div class="note"><b>Pick by situation:</b> one Claude Code session in one terminal and you stay at your desk → the bell, and stop here. Comfortable with JSON and Claude Code is your only agent → the DIY hook covers the real need. Several agents a day, or you want <i>waiting-for-permission</i> and <i>failed</i> to look different from <i>done</i> and to be able to walk away → that's what Sleepwing is for.</div>
+
+<h2>中文速览</h2>
+<p>Claude Code 跑长任务时会静默停下——可能是完成、可能在等你确认权限、也可能失败。<a href="index.html">Sleepwing</a> 桌宠通过官方 hooks 接入：在「连接」页一键把命令合并进 <code>~/.claude/settings.json</code>（保留你已有的 hooks，卸载只删自己的条目）。各事件对应一种状态：<code>UserPromptSubmit</code>/<code>PreToolUse</code>/<code>PostToolUse</code> 为「工作中」，<code>PermissionRequest</code> 与 <code>Notification</code>（仅 <code>permission_prompt</code>、<code>idle_prompt</code>、<code>elicitation_dialog</code>、<code>agent_needs_input</code> 四类）为「等你」，<code>Stop</code> 为「完成」，<code>StopFailure</code> 按无内容的失败处理、不会被同时到达的 <code>SessionEnd</code> 抹成完成。点「打开任务」可跳回 Terminal.app / iTerm2 的确切标签页（依据 tty 设备名，不读终端内容与路径；首次需系统授权；其他终端退化为激活应用）。如实说明：Claude Code 目前标注为「支持接入」，完整生命周期的验收数据来自 pi / Codex / OpenCode；hook 投递为尽力而为，应用未运行时丢事件而不排队。不想装应用：终端铃声（<code>/config</code>）或自己写 hooks 播音效（上面有可复制配置，注意合并而非覆盖）就够用——单 Agent 场景推荐先用它们。零外联、无账户、无遥测，hook 在本地脱敏后只留下「提供方、会话编号、状态、时间、可选的短任务标签、本地跳回路由」。免费 Beta。</p>
+
+<footer>
+Facts checked 2026-10 against official docs; corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+See also: <a href="guide-agent-notifications.html">every notification option compared</a> · <a href="cursor.html">the Cursor guide</a> · <a href="opencode.html">the OpenCode guide</a> · <a href="gemini-cli.html">the Gemini CLI guide</a> · <a href="trae.html">TRAE（中文）</a> · <a href="compare.html">Sleepwing vs the alternatives</a>.
+</footer>
+</main>
+</body>
+</html>
