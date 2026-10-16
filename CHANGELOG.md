@@ -7,6 +7,20 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.5-beta.1] - 2026-10-16
+
+### Fixed
+
+- A health nudge no longer hides which agents are running. The nudge
+  deliberately outranks "working" on the companion, but an unanswered one
+  had no expiry: unless you pressed one of its three buttons — or locked
+  the screen, which hands it to a system notification — it held the stage
+  indefinitely while real agent sessions went unreported. An ignored nudge
+  now yields the companion back to agent status after ten minutes (the
+  same window a snooze earns) and closes its record honestly as skipped
+  instead of leaving it pending out of sight. An agent that needs you
+  still outranks a live nudge.
+
 ## [0.6.4-beta.1] - 2026-09-09
 
 ### Fixed

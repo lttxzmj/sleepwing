@@ -3170,3 +3170,39 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
     )
     #expect(gate.route(genuineAsk)?.phase == .waitingForInput)
 }
+
+@Test func unansweredNudgeYieldsTheStageBackToAgentStatus() {
+    // User-reported 2026-10-15: with five agent sessions working, the
+    // companion showed "take a break" and never the agent status. A
+    // health nudge outranks working by design, but an unanswered one had
+    // no expiry at all — it masked which agents were running for as long
+    // as the user stayed logged in.
+    var reducer = CompanionPresentationReducer()
+    let shown = Date(timeIntervalSince1970: 1_790_000_000)
+
+    // Precedence itself is intended: the nudge takes the stage.
+    #expect(reducer.derive(
+        agentPhase: .working, healthReminder: .eyes, at: shown
+    ) == .healthNudge(.eyes))
+
+    // Before the window closes it keeps the stage.
+    #expect(!ReminderPresentationPolicy.hasLapsed(
+        presentedAt: shown, now: shown.addingTimeInterval(9 * 60)
+    ))
+    // At and after the window it has lapsed, and the companion goes back
+    // to reporting work.
+    #expect(ReminderPresentationPolicy.hasLapsed(
+        presentedAt: shown, now: shown.addingTimeInterval(10 * 60)
+    ))
+    let lapsed = shown.addingTimeInterval(11 * 60)
+    #expect(ReminderPresentationPolicy.hasLapsed(presentedAt: shown, now: lapsed))
+    #expect(reducer.derive(
+        agentPhase: .working, healthReminder: nil, at: lapsed
+    ) == .working)
+
+    // An agent that needs the user still outranks a live nudge — the
+    // recall promise is never traded away for a break prompt.
+    #expect(reducer.derive(
+        agentPhase: .waitingForInput, healthReminder: .eyes, at: lapsed
+    ) == .needsAttention)
+}

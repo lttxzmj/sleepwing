@@ -19,3 +19,9 @@ xcuserdata/
 __pycache__/
 *.py[cod]
 *.log
+
+# Scheduler runtime state. runCount/lastStatus/nextRun are rewritten on every
+# agent run, so tracking this file guarantees a dirty worktree and deadlocks
+# the release gate. The durable half (loop definitions) is snapshotted by
+# Scripts/ops/snapshot-schedules.sh into docs/ops/schedules-snapshot.json.
+.pi/subagent-schedules/

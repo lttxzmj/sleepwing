@@ -26,6 +26,9 @@ struct CompanionReminder: Identifiable, Equatable {
     let recordID: UUID?
     let kind: ReminderKind
     let qualifyingMinutes: Int
+    /// When the bubble took the companion's stage. A nudge that is never
+    /// answered yields back to agent status once this moment has passed.
+    let presentedAt: Date
     var moment: ReminderCopyMoment
     var message: String
 }
@@ -2098,6 +2101,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(15))
                 await self?.refreshNotificationAuthorization()
+                self?.expireLapsedReminderIfNeeded()
                 ticks += 1
                 if ticks % 4 == 0 {
                     await self?.rescanIntegrationStatusesInBackground()
@@ -2661,6 +2665,7 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
                 recordID: recordID,
                 kind: kind,
                 qualifyingMinutes: qualifyingMinutes,
+                presentedAt: now,
                 moment: moment,
                 message: message
             )
@@ -3387,6 +3392,24 @@ final class PerchModel: NSObject, ObservableObject, UNUserNotificationCenterDele
         for url in sorted.dropFirst(keep) {
             try? fileManager.removeItem(at: url)
         }
+    }
+
+    /// An ignored nudge must not hold the stage forever: once its moment
+    /// has passed the companion goes back to reporting agent status, and
+    /// the record is honestly closed as skipped instead of staying
+    /// pending out of the user's sight.
+    private func expireLapsedReminderIfNeeded(at now: Date = .now) {
+        guard let reminder = activeReminder,
+              ReminderPresentationPolicy.hasLapsed(
+                  presentedAt: reminder.presentedAt,
+                  now: now
+              ) else {
+            return
+        }
+        activeReminder = nil
+        refreshPresentation(at: now)
+        guard let recordID = reminder.recordID else { return }
+        applyReminderResponse(recordID: recordID, response: .skipped)
     }
 
     func respondToCompanionReminder(_ response: ReminderResponse) {
