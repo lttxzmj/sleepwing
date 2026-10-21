@@ -99,3 +99,13 @@ Bug 报告不得附带提示词、代码或私有文件。优先提供 Sleepwing
 3. 健康提醒太早、太晚、太频繁，还是刚好？
 4. Agent 需要你时，你能否立即知道要回到哪个任务？
 5. 哪一步仍然要求你理解 Hook、CLI 或配置文件？
+
+答在哪里：**[Q&A 讨论区](https://github.com/lttxzmj/sleepwing/discussions/categories/q-a)**（中英文都行）。一句话就够，不用跑完整个回归清单，
+挑一个你真有话说的问题答即可。**不要附日志、路径、提示词或代码**——这些我们既不需要
+也不想收；描述现象就行（"提醒来得太频繁"比一份诊断报告有用）。
+
+Where to answer: the **[Q&A discussions](https://github.com/lttxzmj/sleepwing/discussions/categories/q-a)**, in English or Chinese. One line
+is enough — pick the single question you actually have an opinion on; you do not
+need to finish the regression list. **Please don't attach logs, paths, prompts or
+code** — we don't need them and don't want them. Describing what you saw is
+plenty ("the reminders came too often" beats a diagnostic dump).

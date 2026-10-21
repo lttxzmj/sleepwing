@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A desktop pet for your Mac that actually does something — free options, Codex Pets, and one that watches your AI agents</title>
+<meta name="description" content="Most Mac desktop pets are decoration you close by Friday. Here are the honest options — free menu-bar pets, OpenAI's built-in Codex Pets, open-source cross-platform pets, and a free pet made from your own cat's photo that reacts to your AI coding agents.">
+<link rel="canonical" href="https://lttxzmj.github.io/sleepwing/desktop-pet.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Sleepwing">
+<meta property="og:title" content="A desktop pet for your Mac that actually does something">
+<meta property="og:description" content="Free pets, Codex Pets, and a pet made from your own photo that reacts to what your AI coding agents are doing — honestly compared.">
+<meta property="og:image" content="https://lttxzmj.github.io/sleepwing/assets/sleepwing-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#FBFCFB">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121716">
+<link rel="icon" type="image/png" href="assets/perch-icon-appicon.png">
+<style>
+:root{--bg:#FBFCFB;--fg:#1c2422;--muted:#5c6a66;--accent:#1e8e7e;--line:#e3e9e7;--card:#f2f6f5}
+@media (prefers-color-scheme:dark){:root{--bg:#121716;--fg:#e8eeec;--muted:#9fb0ab;--accent:#4fc4b0;--line:#263230;--card:#1a2321}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:48px 20px 80px}
+h1{font-size:1.55em;line-height:1.35}h2{margin-top:2em;font-size:1.2em}
+a{color:var(--accent)}p.lead{color:var(--muted)}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;overflow-x:auto;font-size:.85em}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.92em}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:10px 22px;border-radius:10px;text-decoration:none;font-weight:600;margin:14px 0}
+footer{color:var(--muted);font-size:.85em;margin-top:48px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<main>
+<p><a href="index.html">← Sleepwing</a></p>
+<h1>A desktop pet for your Mac that actually does something</h1>
+<p class="lead">Most desktop pets are decoration: charming on Monday, closed by Friday, because they never tell you anything you didn't already know. The ones that stick have a job. Here's the honest range of options on macOS — several of them free and none of them ours — ending with the one we build.</p>
+
+<h2>Option 1 — a pet that's just nice to look at (free)</h2>
+<p>If what you want is a bit of life on the desktop, take the free route and stop there. Two that are genuinely good at this:</p>
+<ul>
+<li><b>RunCat Neo</b> — a cat that runs in your menu bar, faster as your CPU gets busier. It's open source (Apache-2.0), free on the App Store, and accepts <b>custom PNG runners and custom JSON metrics</b>, so people have wired it to show things like Claude Code usage. It wants a recent macOS, so check the requirement before installing.</li>
+<li><b>Cat Gatekeeper</b> — a cat that interrupts you for breaks. Free, local timer, no account, no tracking. It's a lovely pomodoro with a cat on top; it has no idea what your agents are doing.</li>
+</ul>
+<p>Honest framing: these are decoration and timers. A menu-bar CPU graph can't distinguish "my agent finished" from "Xcode is indexing," and a fixed-interval break timer will nudge you at the exact moment your agent is waiting for a decision.</p>
+
+<h2>Option 2 — if you use Codex or ChatGPT desktop, you already have one (free, built in)</h2>
+<p>OpenAI ships <b>Pets</b> as an official Codex feature: a floating desktop pet and activity tray in ChatGPT desktop, a <code>/pet</code> command, a built-in terminal pet in Codex CLI (iTerm2/Kitty/Sixel), and pet states for <b>Running / Needs input / Ready / Blocked</b>. You can upload your own sprite sheet. Codex also has its own separate notification settings for turn completion, permissions, and questions.</p>
+<p>There's a real community ecosystem around that format — free galleries like <a href="https://codexpet.top" rel="nofollow">codexpet.top</a> and <a href="https://petdex.dev" rel="nofollow">Petdex</a> install pets straight into <code>~/.codex/pets/</code>.</p>
+<p><b>If Codex is the only agent you use, this is the answer.</b> It's first-party, free, and already installed. The limit is the obvious one: it watches Codex. Your Claude Code run in another terminal and your Cursor window don't exist to it.</p>
+
+<h2>Option 3 — DIY: make a sound or a banner, no pet at all (free)</h2>
+<p>Sometimes the pet is not the point and you just want to know when a long run ends. Every major agent can run a shell command on its own lifecycle events. For Claude Code, this goes in <code>~/.claude/settings.json</code> and plays one sound when the agent needs you, another when it stops:</p>
+<pre><code>{
+  "hooks": {
+    "Notification": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Glass.aiff" }] }],
+    "Stop": [{ "hooks": [{ "type": "command",
+      "command": "afplay /System/Library/Sounds/Funk.aiff" }] }]
+  }
+}</code></pre>
+<p>Merge it into your existing <code>hooks</code> object rather than replacing the file; follow the <a href="https://code.claude.com/docs/en/hooks" rel="nofollow">official hooks docs</a> for the current shape. Honest limits: every <code>Notification</code> sounds the same, nothing tells you <em>which</em> project, and you rebuild it per agent — Cursor uses <code>~/.cursor/hooks.json</code>, Codex uses <code>~/.codex/hooks.json</code>, OpenCode uses a TypeScript plugin, Gemini CLI uses <code>~/.gemini/settings.json</code>. Each one is a different format. We wrote that up per agent: <a href="claude-code.html">Claude Code</a>, <a href="cursor.html">Cursor</a>, <a href="opencode.html">OpenCode</a>, <a href="gemini-cli.html">Gemini CLI</a>.</p>
+<p>If you want an actual animated pet across several agents and you're <b>not</b> on macOS, the open-source <a href="https://github.com/rullerzhou-afk/clawd-on-desk" rel="nofollow">clawd-on-desk</a> is the one to look at — a pixel pet that reflects agent state, covers multiple agents, runs on Windows, macOS and Linux, and can import Codex pet animation packs. It's free. We're macOS-only, so for Windows and Linux it beats us by default.</p>
+
+<h2>Option 4 — a pet that watches every agent, and is your own animal</h2>
+<p><a href="index.html">Sleepwing</a> (free beta, macOS 14+, Apple Silicon) is the version of this we wanted and couldn't find: <b>one</b> pet on the desktop that represents every connected agent, with a specific job beyond looking cute.</p>
+<ul>
+<li><b>It knows which state it's in, per session.</b> Working, waiting-for-you, finished, failed — through each provider's official local hooks: Claude Code, Cursor IDE and CLI, ChatGPT/Codex, OpenCode, Gemini CLI, TRAE, and the pi coding agent. One pet, not seven. Installation is reversible and never touches hooks it doesn't own.</li>
+<li><b>It gets you back in one click.</b> "Open task" selects the exact terminal tab in Terminal.app or iTerm2, using only the session's controlling tty device name (for example <code>ttys012</code>) — never terminal contents, paths, or window titles.</li>
+<li><b>It turns waiting into actual breaks.</b> Agent work time counts toward small health nudges — water, stretch, look away — and the timer <em>pauses</em> the moment a session needs you, which is the bug in every fixed-interval break app.</li>
+<li><b>It can be your cat.</b> Pet Studio's "Start from a photo" lifts the subject out of a photo entirely on your Mac — background removed, centered on a transparent canvas — and saves it as reference art in <code>Downloads/Sleepwing Reference Art</code>. You then pick a style (faithful to photo, pixel, plush, sticker, or 3D toy) and hand it to your own coding agent with the bundled <code>perch-pet</code> skill, which produces a complete animated <code>.perchpet</code> package you import back. Two built-in characters ship with the app, three sizes, reduced-motion support; installed Codex-format pets under <code>~/.codex/pets</code> are discovered automatically and appear in the same library.</li>
+<li><b>It makes zero outbound network requests.</b> No account, no telemetry. Hooks reduce events locally before they cross loopback: only the provider, an opaque session ID, the phase, a timestamp, a bounded task label, and an allowlisted local resume route. <a href="https://github.com/lttxzmj/sleepwing">Grep the source</a> — it's source-available under FSL-1.1-MIT. Measured on the release build: ≈0.8% CPU and ≈100 MB while the pet idles at 30 fps.</li>
+</ul>
+<p>Honest limits, because they matter here: <b>macOS 14+ on Apple Silicon only</b> — no Intel build, no Windows, no Linux. Hook delivery is best-effort and never blocks your agent, so if the app isn't running you lose a notification rather than a turn. And the photo flow is honest about the division of labour: the subject lift and the import validation are native and local, but the animated sprite production is done by <em>your</em> agent, which needs image generation and visual inspection — whatever that agent sends to its own model is between you and it. Sleepwing itself sends nothing.</p>
+<p><a class="cta" href="https://github.com/lttxzmj/sleepwing/releases/latest">⬇ Download the notarized beta (macOS 14+, Apple Silicon)</a></p>
+
+<div class="note"><b>Pick by situation:</b> you want decoration or a CPU cat → RunCat Neo, free, stop here. Breaks but no agents → Cat Gatekeeper. Codex is your only agent → use OpenAI's built-in Pets, it's first-party and already there. Windows or Linux → clawd-on-desk. Just want a sound at the end of one agent's run → the DIY hook above, no app needed. Several agents a day on a Mac, you want <i>waiting-for-you</i> to look different from <i>done</i>, and you'd like the pet to be your own animal → that's what Sleepwing is for.</div>
+
+<h2>中文速览</h2>
+<p>大多数 Mac 桌宠是纯装饰，新鲜两天就关掉了——因为它们并不知道你的电脑在干什么。诚实的几种选择：<b>只要可爱</b>就用 RunCat Neo（菜单栏跑猫，开源 Apache-2.0，免费，支持自定义 PNG 角色与自定义 JSON 指标，注意它要求较新的 macOS）或 Cat Gatekeeper（猫咪休息提醒，本地计时、无账户、无追踪）；<b>只用 Codex</b> 的话官方自带 Pets 最合适——ChatGPT 桌面端的浮动桌宠与活动托盘、<code>/pet</code> 命令、Codex CLI 终端宠物，四种状态（Running / Needs input / Ready / Blocked），还能上传自定义精灵图，社区画廊（codexpet.top、Petdex）可一键装到 <code>~/.codex/pets/</code>，但它只看 Codex；<b>只想要个提示音</b>就自己写 hook（上面有可复制的 <code>~/.claude/settings.json</code> 配置，注意合并而非覆盖；各家格式不同：Cursor 用 <code>~/.cursor/hooks.json</code>、OpenCode 用 TS 插件、Gemini CLI 用 <code>~/.gemini/settings.json</code>）；<b>不用 macOS</b> 就看开源的 clawd-on-desk（Win/mac/Linux 全覆盖、免费、可导入 Codex 宠物动画包）。</p>
+<p><a href="index.html">Sleepwing</a> 做的是另一件事：一只桌宠代表所有 Agent（Claude Code、Cursor、Codex、OpenCode、Gemini CLI、TRAE、pi），通过各家官方本地 hooks 区分「工作中／等你／完成／失败」，可逆安装、不碰你已有的 hooks；点一下跳回 Terminal.app / iTerm2 的确切标签页（仅依据 tty 设备名，不读终端内容与路径）；把 Agent 工作时间换成真实的小休息，并在 Agent 等你时自动暂停提醒。Pet Studio 的「从照片开始」在本机抠出主体（去背、居中、透明），存到 <code>Downloads/Sleepwing Reference Art</code>，选风格（忠于照片／像素／毛绒／贴纸／3D 玩具）后交给你自己的 Agent 用自带 <code>perch-pet</code> 技能产出完整动画包再导入——照片不离开本机；<code>~/.codex/pets</code> 下已装的 Codex 格式宠物会自动出现在同一个库里。零外联、无账户、无遥测，源码可审计（FSL-1.1-MIT）。如实说明短板：仅支持 macOS 14+ Apple Silicon（无 Intel／Windows／Linux 版本）；hook 为尽力而为投递，应用未运行时丢事件而不排队；动画产出依赖你的 Agent 具备出图与自检能力，Sleepwing 本身不联网。免费 Beta。</p>
+
+<footer>
+Sleepwing facts checked 2026-10; third-party facts checked 2026-09 against official sources and may have changed — corrections welcome via <a href="https://github.com/lttxzmj/sleepwing/discussions">GitHub Discussions</a>.
+See also: <a href="guide-agent-notifications.html">every notification option compared</a> · <a href="claude-code.html">the Claude Code guide</a> · <a href="cursor.html">the Cursor guide</a> · <a href="opencode.html">the OpenCode guide</a> · <a href="gemini-cli.html">the Gemini CLI guide</a> · <a href="trae.html">TRAE（中文）</a> · <a href="gallery.html">pet gallery</a> · <a href="compare.html">Sleepwing vs the alternatives</a>.
+</footer>
+</main>
+</body>
+</html>

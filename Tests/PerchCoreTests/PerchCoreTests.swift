@@ -3206,3 +3206,29 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
         agentPhase: .waitingForInput, healthReminder: .eyes, at: lapsed
     ) == .needsAttention)
 }
+
+@Test func geminiFiringSessionEndTwiceSettlesOnce() {
+    // Measured on Gemini CLI 0.33.1 (2026-10-19): SessionEnd fires twice per
+    // exit, ~30 ms apart, both with reason "exit". A consumer that treats the
+    // second one as a fresh edge would re-announce a finish the user already
+    // saw, so the equal-phase path must stay edge-free.
+    let now = Date(timeIntervalSince1970: 2_000)
+    var reducer = AgentStateReducer()
+    reducer.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .working, timestamp: now))
+    let first = reducer.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .idle, timestamp: now.addingTimeInterval(1)))
+    let second = reducer.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .idle, timestamp: now.addingTimeInterval(1.03)))
+    #expect(first.didSettle)
+    #expect(second.didSettle)
+    #expect(!first.didComplete)
+    #expect(!second.didComplete)
+    #expect(!first.didRequestAttention)
+    #expect(!second.didRequestAttention)
+    // Neither trailing exit may erase a failure the user still needs to see;
+    // a failure aggregates as "needs you", which is what keeps the recall
+    // promise alive after the session has already exited twice.
+    var failing = AgentStateReducer()
+    failing.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .failed, timestamp: now))
+    failing.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .idle, timestamp: now.addingTimeInterval(1)))
+    failing.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .idle, timestamp: now.addingTimeInterval(1.03)))
+    #expect(failing.aggregatePhase == .waitingForInput)
+}

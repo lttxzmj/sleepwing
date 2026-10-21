@@ -183,3 +183,10 @@ allowlisted `codex://threads/<session-id>` routes and are not written to
 statistics or diagnostic reports.
 
 The complete policy is in [PRIVACY.md](PRIVACY.md) (also available in [Chinese](PRIVACY.zh-Hans.md)).
+
+## Questions and feedback
+
+Ask in the **[Q&A discussions](https://github.com/lttxzmj/sleepwing/discussions/categories/q-a)** — English or Chinese, both are read.
+Because Sleepwing reports nothing about you, a question or a complaint there is
+the only way we find out anything. Please leave logs, paths, prompts and code
+out of it; we neither need nor want them.
