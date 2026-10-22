@@ -1,4 +1,5 @@
 import AppKit
+import PerchCore
 
 /// Selects the exact terminal tab hosting an agent session, identified by
 /// the session's controlling tty device. Scriptable terminals (Terminal.app,
@@ -18,7 +19,79 @@ enum TerminalTabRouter {
            run(iterm2Script(device: device)) {
             return true
         }
+        // Not a tab tty: the session may be inside a tmux pane, whose pty no
+        // terminal owns. Select the pane first, then focus the tab the
+        // attached client occupies.
+        return focusTmuxPane(agentTTYName: ttyName)
+    }
+
+    /// Returns true only when the outer tab was actually focused. Selecting
+    /// the pane while the session is detached is still worth doing — a later
+    /// attach then lands on the agent — but it is not a focus, so the caller
+    /// keeps its app-activation fallback.
+    private static func focusTmuxPane(agentTTYName: String) -> Bool {
+        guard let tmux = tmuxExecutableURL(),
+              let panes = output(of: tmux, [
+                  "list-panes", "-a", "-F", "#{pane_tty}\t#{pane_id}\t#{session_id}",
+              ]),
+              let clients = output(of: tmux, [
+                  "list-clients", "-F", "#{client_tty}\t#{session_id}",
+              ]),
+              let route = TmuxPaneLocator.route(
+                  forAgentTTYName: agentTTYName, panes: panes, clients: clients
+              )
+        else { return false }
+
+        // Identifiers are %N / $N, validated by the locator, and go to tmux
+        // through argv — never a shell, never an AppleScript string.
+        _ = output(of: tmux, ["select-window", "-t", route.paneID])
+        _ = output(of: tmux, ["select-pane", "-t", route.paneID])
+
+        guard let clientTTY = route.clientTTYName else { return false }
+        let clientDevice = "/dev/\(clientTTY)"
+        if isRunning("com.apple.Terminal"),
+           run(appleTerminalScript(device: clientDevice)) {
+            return true
+        }
+        if isRunning("com.googlecode.iterm2"),
+           run(iterm2Script(device: clientDevice)) {
+            return true
+        }
         return false
+    }
+
+    private static func tmuxExecutableURL() -> URL? {
+        ["/opt/homebrew/bin/tmux", "/usr/local/bin/tmux", "/usr/bin/tmux"]
+            .map(URL.init(fileURLWithPath:))
+            .first { FileManager.default.isExecutableFile(atPath: $0.path) }
+    }
+
+    /// Never blocks the caller for long: tmux answers in milliseconds, and a
+    /// wedged server must not freeze a click on "Open task".
+    private static func output(of executable: URL, _ arguments: [String]) -> String? {
+        let process = Process()
+        process.executableURL = executable
+        process.arguments = arguments
+        let pipe = Pipe()
+        process.standardOutput = pipe
+        process.standardError = FileHandle.nullDevice
+        do {
+            try process.run()
+        } catch {
+            return nil
+        }
+        let deadline = Date().addingTimeInterval(2)
+        while process.isRunning, Date() < deadline {
+            usleep(20_000)
+        }
+        if process.isRunning {
+            process.terminate()
+            return nil
+        }
+        guard process.terminationStatus == 0,
+              let data = try? pipe.fileHandleForReading.readToEnd()
+        else { return nil }
+        return String(data: data, encoding: .utf8)
     }
 
     private static func isRoutableTTYName(_ value: String) -> Bool {

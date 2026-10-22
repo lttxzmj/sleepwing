@@ -7,6 +7,20 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.6-beta.1] - 2026-10-22
+
+### Added
+
+- "Open task" now lands on the right tmux pane. An agent running inside tmux
+  sees the pane's pty, which no terminal owns as a tab, so exact-tab return
+  silently degraded to merely activating the app for every multiplexer user —
+  which is most people running several agents at once. Sleepwing now selects
+  the agent's pane and then focuses the tab its attached client occupies. A
+  detached session still gets its pane selected, so a later attach arrives in
+  the right place. Panes are addressed by tmux's own `%pane`/`$session`
+  identifiers rather than `session:window.pane` names, because a session name
+  containing a colon breaks name-based targeting outright.
+
 ## [0.6.5-beta.1] - 2026-10-16
 
 ### Fixed

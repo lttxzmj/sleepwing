@@ -36,9 +36,10 @@ jumps back to the terminal tab that session actually lives in, so you stop hunti
 through windows. The waiting becomes a bounded health break on the way, and nothing
 leaves your machine.
 
-Tab-exact return reads the tty device name, so it is precise in Terminal.app and iTerm2
-and degrades to activating the app elsewhere; it needs one system permission the first
-time. Hook delivery is best-effort and never blocks your agent.
+Tab-exact return reads the tty device name, so it is precise in Terminal.app and iTerm2,
+including sessions inside **tmux** (the agent's pane is selected, then its tab focused);
+it degrades to activating the app in other terminals, and needs one system permission the
+first time. Hook delivery is best-effort and never blocks your agent.
 
 > When AI takes over the work, Sleepwing gives the time back to your body—and calls you back when it is your turn.
 

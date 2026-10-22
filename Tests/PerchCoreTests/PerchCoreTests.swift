@@ -3232,3 +3232,38 @@ private func perchContainsHanCharacters(_ value: String) -> Bool {
     failing.ingest(AgentEvent(provider: .gemini, sessionID: "g", phase: .idle, timestamp: now.addingTimeInterval(1.03)))
     #expect(failing.aggregatePhase == .waitingForInput)
 }
+
+@Test func tmuxPaneRouteUsesIdentifiersNotNames() {
+    // Fixtures are verbatim tmux 3.7b output captured 2026-10-22, including
+    // the case that motivated using %pane/$session ids: a session whose name
+    // contains a colon and spaces breaks name-based targeting entirely.
+    let panes = "/dev/ttys017\t%1\t$1\n/dev/ttys005\t%0\t$0\n"
+    let clients = "/dev/ttys017\t$0\n"
+
+    let route = TmuxPaneLocator.route(
+        forAgentTTYName: "ttys005", panes: panes, clients: clients
+    )
+    #expect(route == TmuxPaneLocator.Route(
+        paneID: "%0", sessionID: "$0", clientTTYName: "ttys017"
+    ))
+
+    // A detached session still yields a pane to select, but no tab to focus.
+    #expect(TmuxPaneLocator.route(
+        forAgentTTYName: "ttys005", panes: panes, clients: ""
+    ) == TmuxPaneLocator.Route(paneID: "%0", sessionID: "$0", clientTTYName: nil))
+
+    // A tty tmux doesn't know is not ours to route.
+    #expect(TmuxPaneLocator.route(
+        forAgentTTYName: "ttys999", panes: panes, clients: clients
+    ) == nil)
+
+    // Nothing that is not a plain tty device may reach an AppleScript string,
+    // and nothing that is not %N / $N may reach a tmux argument.
+    #expect(TmuxPaneLocator.parsePanes("/dev/../etc/passwd\t%0\t$0").isEmpty)
+    #expect(TmuxPaneLocator.parsePanes("/dev/ttys005\t%0; rm -rf /\t$0").isEmpty)
+    #expect(TmuxPaneLocator.parsePanes("/dev/ttys005\tpane0\t$0").isEmpty)
+    #expect(TmuxPaneLocator.parsePanes("/dev/ttys005\t%0").isEmpty)
+    #expect(TmuxPaneLocator.parseClients("/dev/ttys017\t$0\n/dev/ttys018\t$0").count == 1)
+    #expect(TmuxPaneLocator.ttyName(fromDevicePath: "/dev/ttys005") == "ttys005")
+    #expect(TmuxPaneLocator.ttyName(fromDevicePath: "/dev/tty") == nil)
+}
