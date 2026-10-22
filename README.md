@@ -28,7 +28,17 @@ brew install --cask lttxzmj/tap/sleepwing
 > Measured on the release build (Apple Silicon, 40 s idle sample): **≈0.8% CPU, ≈100 MB memory** while the pet idles at 30 fps. Resource ceilings are pinned by tests.
 
 
-Sleepwing is a privacy-first macOS desktop companion that watches local AI coding agents while the user takes a real break. It turns verified Agent work time into bounded health opportunities, then recalls the user when an Agent needs input. One companion represents every connected Agent; the menu bar handles exact status, integrations, and local statistics.
+Run several coding agents at once and the hard question stops being "is it done" and
+becomes **"which one needs me, and where is it?"** Sleepwing answers both. One pet
+watches all seven connected agents — Claude Code, Codex, Cursor, OpenCode, Gemini CLI,
+TRAE and pi — and tells working apart from waiting-on-you apart from failed. "Open task"
+jumps back to the terminal tab that session actually lives in, so you stop hunting
+through windows. The waiting becomes a bounded health break on the way, and nothing
+leaves your machine.
+
+Tab-exact return reads the tty device name, so it is precise in Terminal.app and iTerm2
+and degrades to activating the app elsewhere; it needs one system permission the first
+time. Hook delivery is best-effort and never blocks your agent.
 
 > When AI takes over the work, Sleepwing gives the time back to your body—and calls you back when it is your turn.
 
@@ -183,6 +193,46 @@ allowlisted `codex://threads/<session-id>` routes and are not written to
 statistics or diagnostic reports.
 
 The complete policy is in [PRIVACY.md](PRIVACY.md) (also available in [Chinese](PRIVACY.zh-Hans.md)).
+
+## Verify it yourself in 30 seconds
+
+Don't take the badge's word for it. With Sleepwing running:
+
+```sh
+lsof -i -P | grep Perch
+```
+
+You should see exactly one line, and it should look like this:
+
+```
+Perch   46896 you    3u  IPv4 ...  TCP 127.0.0.1:7534 (LISTEN)
+```
+
+That is the local receiver your agents' hooks post to. `127.0.0.1` is your own
+machine; nothing is listening on a public interface and nothing is dialling
+out. If a second line ever appears, that is a bug — please
+[open a discussion](https://github.com/lttxzmj/sleepwing/discussions/categories/q-a).
+
+Two honest notes. The process is called `Perch`, not `Sleepwing` — that was the
+project's original name and the executable still carries it, so grepping for
+"Sleepwing" returns nothing and tells you nothing. And the check above is a
+snapshot; if you want continuous proof, Little Snitch or LuLu will show the same
+thing over time.
+
+**There is also no "export your data" button, because there is no data.** Nothing
+of yours is stored anywhere we can reach. Uninstalling leaves the short list in
+[docs/UNINSTALL.md](docs/UNINSTALL.md) and nothing else.
+
+## One maintainer, and what happens if I stop
+
+Sleepwing is built by one person. That is worth saying plainly, because this
+category has taught people to expect abandonment — Arc, Rewind's Mac app and
+Humane's Pin were all loved by someone before they were switched off.
+
+So the guarantee is in the licence, not in a promise: **every release becomes MIT
+two years after it ships** (FSL, see [LICENSE.md](LICENSE.md)). If I disappear,
+the code you are running becomes yours to fork and keep, on a date you can
+calculate today. No account, no server, nothing to shut down.
 
 ## Questions and feedback
 
