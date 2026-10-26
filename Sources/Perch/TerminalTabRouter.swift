@@ -88,9 +88,12 @@ enum TerminalTabRouter {
             process.terminate()
             return nil
         }
-        guard process.terminationStatus == 0,
-              let data = try? pipe.fileHandleForReading.readToEnd()
-        else { return nil }
+        guard process.terminationStatus == 0 else { return nil }
+        // readToEnd() returns nil for an empty stream, and `tmux
+        // list-clients` legitimately prints nothing when a session is
+        // detached. Treating that as failure made the detached-pane path
+        // unreachable, which falsified a claim we had already published.
+        let data = (try? pipe.fileHandleForReading.readToEnd()) ?? Data()
         return String(data: data, encoding: .utf8)
     }
 

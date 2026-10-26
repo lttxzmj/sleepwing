@@ -7,6 +7,29 @@ All notable user-facing changes to Sleepwing are documented here.
 - Public beta distribution and lifecycle acceptance remain release gates; see
   [the release checklist](docs/RELEASE_CHECKLIST.md).
 
+## [0.6.7-beta.1] - 2026-10-26
+
+### Fixed
+
+- A detached tmux session now really does get its pane selected. 0.6.6
+  claimed this on the site, in the README and in the release notes, and the
+  claim was false: `FileHandle.readToEnd()` returns nil for an empty stream,
+  and `tmux list-clients` legitimately prints nothing when no client is
+  attached, so the lookup read that as a failed command and gave up before
+  selecting anything. Verified on a real two-pane session — the targeted
+  pane's `pane_active` now flips from 0 to 1 — and the four outcomes are
+  distinguished by exit code rather than collapsed into success.
+
+### Added
+
+- `ttyfocus`, a standalone MIT command that focuses the terminal tab or tmux
+  pane owning a tty device. It is the one hard part of any agent-notification
+  script and nobody publishes it; cross-platform notifiers cannot do it
+  because the only reliable mechanism is macOS-native. Exit codes let a
+  caller fall back honestly instead of believing a lie: 0 focused, 1 nothing
+  owns that device, 2 bad argument, 3 pane selected but its session is
+  detached.
+
 ## [0.6.6-beta.1] - 2026-10-22
 
 ### Added

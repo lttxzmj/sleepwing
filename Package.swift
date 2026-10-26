@@ -9,6 +9,7 @@ let package = Package(
         .library(name: "PerchCore", targets: ["PerchCore"]),
         .executable(name: "Perch", targets: ["Perch"]),
         .executable(name: "PerchRelay", targets: ["PerchRelay"]),
+        .executable(name: "ttyfocus", targets: ["TTYFocus"]),
     ],
     targets: [
         .target(name: "PerchCore"),
@@ -24,6 +25,10 @@ let package = Package(
         ),
         .executableTarget(
             name: "PerchRelay",
+            dependencies: ["PerchCore"]
+        ),
+        .executableTarget(
+            name: "TTYFocus",
             dependencies: ["PerchCore"]
         ),
         .testTarget(name: "PerchCoreTests", dependencies: ["PerchCore"]),
