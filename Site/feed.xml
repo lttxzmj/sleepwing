@@ -7,6 +7,13 @@
 <description>Build-in-public notes from Sleepwing — the privacy-first macOS desktop pet that watches your AI coding agents.</description>
 <language>en</language>
 <item>
+<title>Landing in the pane, not just the app</title>
+<link>https://lttxzmj.github.io/sleepwing/notes.html</link>
+<guid isPermaLink="false">sleepwing-note-2026-10-26</guid>
+<pubDate>Mon, 26 Oct 2026 03:30:00 GMT</pubDate>
+<description>An agent inside tmux sees the pane's pty, which no terminal owns as a tab, so tab-exact return silently degraded to activating the app for every multiplexer user. 0.6.6-beta.1 build 23 selects the agent's pane, then focuses its attached client's tab. Panes are addressed by tmux's own %pane/$session ids, because a colon in a session name breaks name-based targeting outright.</description>
+</item>
+<item>
 <title>A nudge is a moment, not a state</title>
 <link>https://lttxzmj.github.io/sleepwing/notes.html</link>
 <guid isPermaLink="false">sleepwing-note-2026-10-19</guid>

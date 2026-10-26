@@ -126,15 +126,20 @@ The downloaded app has no npm, Node.js, Python, or developer-checkout runtime de
 
 ## Integration support
 
-| Surface | Beta support | Boundary |
-|---|---|---|
-| Claude Code | Local lifecycle hooks | Local sessions only |
-| Cursor IDE / CLI | Local Agent hooks | Cloud Agents remain out of scope |
-| ChatGPT desktop / Codex CLI / IDE | Current Codex lifecycle hooks inside the ChatGPT product; legacy `notify` remains completion-only | First install may require `/hooks` trust; ordinary chats are not lifecycle tasks |
-| OpenCode | Official local plugin lifecycle events | Implemented and fixture-tested; stable-session smoke test remains |
-| Gemini CLI | Official local hooks | Installed and relay-verified on the test Mac; real task smoke test remains |
-| TRAE IDE | Official local hooks | International and China config paths supported; fixture-tested, app smoke test remains |
-| pi coding agent | Official local extension lifecycle | Implemented and fixture-tested; real task smoke test remains |
+Evidence column read from the app's own local record on 2026-10-24 — it keeps
+30 days of completed-task counts per provider and nothing else, so these are
+real sessions, not fixtures. Anything not demonstrated is marked as such
+rather than rounded up.
+
+| Surface | Beta support | Verified against real tasks | Boundary |
+|---|---|---|---|
+| ChatGPT desktop / Codex CLI / IDE | Current Codex lifecycle hooks inside the ChatGPT product; legacy `notify` remains completion-only | **Yes — 312 real completions** in the last 30 days | First install may require `/hooks` trust; ordinary chats are not lifecycle tasks |
+| pi coding agent | Official local extension lifecycle | **Yes — 284 real completions** in the last 30 days | — |
+| OpenCode | Official local plugin lifecycle events | **Yes — 16 real completions** in the last 30 days | — |
+| Claude Code | Local lifecycle hooks | **Partly.** Working and failure edges exercised in real sessions; the completion edge is still unproven — the backend subscription on the test machine expired before a task could finish | Local sessions only |
+| Gemini CLI | Official local hooks | **No.** Hooks installed and relay-verified, but authentication on the test machine expired, so no real task has completed. Three undocumented behaviours measured on 0.33.1 and handled: `GEMINI_SESSION_ID`/`GEMINI_CWD` arrive empty, `SessionEnd` fires twice per exit, and `$PPID` is the CLI process | Treat as connected, not verified |
+| Cursor IDE / CLI | Local Agent hooks | **No.** No real task recorded; the CLI on the test machine is not signed in | Cloud Agents remain out of scope |
+| TRAE IDE | Official local hooks | **No.** Fixture-tested only; international and China config paths are implemented but no real session has been driven | Treat as connected, not verified |
 
 See [custom pet research and flow](docs/CUSTOM_PET_RESEARCH_AND_FLOW.md),
 [product strategy](docs/PRODUCT_STRATEGY.md),
